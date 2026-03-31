@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Defenders of the Realm: Ultimate</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #0b0c10; color: white; font-family: 'Segoe UI', sans-serif; user-select: none; }
+        
+        #game-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; }
+        canvas { display: block; width: 100%; height: 100%; }
+
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at center, #1f2833 0%, #0b0c10 100%); z-index: 10; overflow-y: auto;}
+        .active-screen { display: flex; }
+        
+        h1 { color: #66fcf1; text-shadow: 0 0 10px #45a29e; font-size: 54px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px;}
+        h2 { color: #c5c6c7; margin-bottom: 5px;}
+        
+        .btn { background: linear-gradient(135deg, #45a29e, #1f2833); color: white; border: 2px solid #66fcf1; padding: 12px 25px; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 6px; margin: 10px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); text-transform: uppercase;}
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(102, 252, 241, 0.4); }
+        .btn:disabled { filter: grayscale(100%); opacity: 0.5; cursor: not-allowed; }
+
+        .top-bar { position: absolute; top: 20px; right: 30px; font-size: 28px; font-weight: bold; color: #66fcf1; z-index: 20; text-shadow: 0 0 5px #45a29e;}
+        
+        .grid { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin: 20px; max-width: 900px;}
+        .card { width: 110px; height: 160px; background: #1f2833; border: 3px solid #45a29e; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; position: relative; }
+        .card.selected { border-color: #f1c40f; box-shadow: 0 0 20px #f1c40f; transform: scale(1.05); z-index: 2;}
+        .card.equipped::after { content: 'EQUIPPED'; position: absolute; top: -10px; background: #2ecc71; padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: bold; }
+        .card.locked { filter: grayscale(100%) brightness(0.4); cursor: not-allowed; }
+        
+        /* Rarity Colors */
+        .rarity-Common { border-color: #bdc3c7; }
+        .rarity-Rare { border-color: #3498db; }
+        .rarity-Epic { border-color: #9b59b6; }
+        .rarity-Legendary { border-color: #f1c40f; box-shadow: 0 0 10px rgba(241, 196, 15, 0.5); }
+
+        .ui-icon { width: 60px; height: 60px; margin-bottom: 5px; }
+
+        #in-game-ui { position: absolute; top: 20px; left: 20px; background: rgba(11, 12, 16, 0.85); padding: 15px; border-radius: 10px; border: 2px solid #45a29e; z-index: 5; pointer-events: auto;}
+        .stat { font-size: 18px; font-weight: bold; margin-bottom: 5px;}
+        #btn-pause { position: absolute; top: 20px; right: 20px; z-index: 5; background: #1f2833; border: 2px solid #c5c6c7; padding: 10px 20px; }
+        
+        #placement-helper { position: absolute; top: 15%; width: 100%; text-align: center; color: #f1c40f; font-size: 28px; font-weight: bold; text-shadow: 0 0 10px #000; display: none; z-index: 4; pointer-events: none; animation: pulseText 1.5s infinite;}
+        @keyframes pulseText { 0% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.7; transform: scale(1); } }
+
+        #placement-bar { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(11, 12, 16, 0.9); border: 2px solid #45a29e; border-radius: 12px; display: flex; padding: 10px; z-index: 5; gap: 15px; }
+        .roster-slot { width: 70px; height: 70px; background: #1f2833; border: 2px solid #c5c6c7; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;}
+        .roster-slot.active { border-color: #f1c40f; box-shadow: 0 0 15px #f1c40f; background: #2a2510; }
+        .roster-cost { position: absolute; bottom: -20px; font-size: 14px; font-weight: bold; color: gold; text-shadow: 1px 1px 2px #000;}
+
+        #upgrade-menu { position: absolute; right: -300px; top: 50%; transform: translateY(-50%); width: 250px; background: rgba(11,12,16,0.95); border: 2px solid #66fcf1; border-radius: 10px 0 0 10px; display: flex; flex-direction: column; padding: 20px; z-index: 6; transition: right 0.3s ease;}
+        #upgrade-menu.open { right: 0; }
+        .upg-stat { margin-bottom: 10px; font-size: 16px; color: #c5c6c7;}
+        
+        .overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        #tutorial-box { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); background: rgba(69, 162, 158, 0.9); border: 2px solid #66fcf1; padding: 20px; border-radius: 10px; z-index: 50; text-align: center; font-size: 18px; font-weight: bold; display: none;}
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="top-bar" id="ui-shards">💎 Shards: <span id="shard-count">0</span></div>
+
+    <div id="screen-menu" class="screen active-screen">
+        <h1>Defenders of the Realm</h1>
+        <p id="menu-hint" style="color: #f1c40f; margin-bottom: 20px; font-size: 20px;"></p>
+        <button class="btn" id="btn-play" onclick="showScreen('screen-map')">Play</button>
+        <button class="btn" id="btn-summon" onclick="showScreen('screen-summon')">Summon Hero</button>
+        <button class="btn" id="btn-inventory" onclick="openInventory()">Barracks (Equip)</button>
+        <button class="btn" onclick="openIndex()" style="background: #2c3e50; border-color: #bdc3c7;">Hero Index</button>
+        <button class="btn" onclick="resetSaveData()" style="font-size: 12px; padding: 5px; margin-top: 50px; border-color: red;">Erase Save Data</button>
+    </div>
+
+    <div id="screen-summon" class="screen">
+        <h2>Summoning Portal</h2>
+        <p style="color: #c5c6c7;">Cost: 100 💎 (Cannot pull duplicates!)</p>
+        <div id="summon-result" class="card" style="display:none; width:200px; height:260px; margin-bottom: 20px;">
+            <div id="summon-rarity" style="font-size: 14px; font-weight: bold; margin-bottom: 10px;">Rarity</div>
+            <svg class="ui-icon" id="summon-icon" viewBox="0 0 100 100" style="width: 80px; height: 80px;"></svg>
+            <div style="font-size: 22px; font-weight: bold; margin-top: 10px;" id="summon-name">Hero</div>
+        </div>
+        <button class="btn" onclick="performSummon()">Summon!</button>
+        <button class="btn" onclick="showScreen('screen-menu')" style="border-color:#555;">Back</button>
+    </div>
+
+    <div id="screen-inventory" class="screen">
+        <h2>Barracks (Equip up to 5)</h2>
+        <div class="grid" id="inv-grid"></div>
+        <div style="display: flex; gap: 15px; margin-top: 20px;">
+            <button class="btn" onclick="equipSelected()">Equip</button>
+            <button class="btn" onclick="unequipSelected()" style="border-color:#e74c3c; color: #e74c3c;">Unequip</button>
+            <button class="btn" onclick="showScreen('screen-menu')" style="border-color:#555;">Back</button>
+        </div>
+    </div>
+
+    <div id="screen-index" class="screen">
+        <h2>Hero Collection</h2>
+        <p style="color: #c5c6c7;">View all heroes in the game.</p>
+        <div class="grid" id="index-grid" style="max-height: 60vh; overflow-y: auto; padding: 10px;"></div>
+        <button class="btn" onclick="showScreen('screen-menu')" style="border-color:#555; margin-top: 20px;">Back</button>
+    </div>
+
+    <div id="screen-map" class="screen">
+        <h2>Select Map & Difficulty</h2>
+        <div class="grid" style="margin-bottom: 40px;">
+            <button class="btn" style="width: 200px; height: 100px; border-color: #2ecc71;">Plains (Map 1)</button>
+        </div>
+        <div class="grid">
+            <button class="btn" id="btn-easy" onclick="setDifficulty('easy')" style="border-color: yellow;">Easy Mode</button>
+            <button class="btn" id="btn-hard" onclick="setDifficulty('hard')">Hard Mode</button>
+        </div>
+        <button class="btn" id="btn-start-game" onclick="startGame()" style="font-size: 24px; padding: 15px 40px; margin-top: 30px;">Start Battle</button>
+        <button class="btn" onclick="showScreen('screen-menu')" style="border-color:#555;">Back</button>
+    </div>
+
+    <div id="screen-game" class="screen" style="background: transparent;">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="in-game-ui">
+            <div class="stat">Gold: <span id="game-gold" style="color: gold;">100</span></div>
+            <div class="stat">Base HP: <span id="game-lives" style="color: #e74c3c;">10</span></div>
+            <div class="stat">Wave: <span id="game-wave">0</span> / 20</div>
+            <button class="btn" onclick="startWave()" style="padding: 8px 15px; font-size: 14px; margin-top: 10px;" id="btn-next-wave">Start Wave</button>
+        </div>
+
+        <button class="btn" id="btn-pause" onclick="togglePause()">II Pause</button>
+
+        <div id="placement-helper">CLICK ON A TOWER TO EQUIP</div>
+        <div id="placement-bar"></div>
+
+        <div id="upgrade-menu">
+            <h3 style="color: #66fcf1; margin-top: 0; text-align: center;" id="upg-title">Hero</h3>
+            <div class="upg-stat">Level: <span id="upg-lvl">1</span> / 5</div>
+            <div class="upg-stat">Damage: <span id="upg-dmg">0</span></div>
+            <div class="upg-stat">Range: <span id="upg-rng">0</span></div>
+            <hr style="border-color: #45a29e; width: 100%;">
+            <button class="btn" id="btn-upgrade" onclick="buyUpgrade()" style="font-size: 14px; padding: 10px;">Upgrade (<span id="upg-cost">50</span>g)</button>
+            <button class="btn" id="btn-sell" onclick="sellTower()" style="font-size: 14px; padding: 10px; border-color: #e74c3c; color: #e74c3c;">Sell (<span id="sell-val">25</span>g)</button>
+            <button class="btn" onclick="closeUpgradeMenu()" style="font-size: 12px; padding: 5px; border-color: #555;">Close</button>
+        </div>
+
+        <div id="tutorial-box"></div>
+    </div>
+
+    <div id="pause-overlay" class="overlay">
+        <h1 style="font-size: 60px;">PAUSED</h1>
+        <button class="btn" onclick="togglePause()">Resume</button>
+        <button class="btn" onclick="exitToMenu()" style="border-color: #e74c3c; color: #e74c3c;">Exit to Menu</button>
+    </div>
+
+    <div id="endless-overlay" class="overlay">
+        <h1 style="color: #2ecc71;">VICTORY!</h1>
+        <p style="font-size: 20px; color: white;">You beat wave 20! Do you want to continue infinitely?</p>
+        <button class="btn" onclick="continueEndless()">Keep Playing</button>
+        <button class="btn" onclick="exitToMenu()">Return to Menu</button>
+    </div>
+</div>
+
+<script>
+    // --- MASSIVE HERO DATABASE ---
+    const HERO_DB = {
+        // COMMONS
+        militia: { id: 'militia', name: 'Militia', rarity: 'Common', cost: 30, dmg: 10, range: 120, cd: 25, projSpeed: 8, color: '#95a5a6', svg: '<rect x="35" y="35" width="30" height="30" fill="#95a5a6"/><circle cx="50" cy="50" r="5" fill="#fff"/>' },
+        archer: { id: 'archer', name: 'Archer', rarity: 'Common', cost: 40, dmg: 15, range: 180, cd: 20, projSpeed: 12, color: '#2ecc71', svg: '<polygon points="50,20 65,80 35,80" fill="#2ecc71"/>' },
+        squire: { id: 'squire', name: 'Squire', rarity: 'Common', cost: 50, dmg: 25, range: 100, cd: 30, projSpeed: 15, color: '#bdc3c7', svg: '<rect x="30" y="30" width="40" height="40" fill="#bdc3c7"/><line x1="50" y1="70" x2="50" y2="10" stroke="#7f8c8d" stroke-width="6"/>' },
+        trapper: { id: 'trapper', name: 'Trapper', rarity: 'Common', cost: 45, dmg: 12, range: 150, cd: 15, projSpeed: 10, color: '#e67e22', svg: '<circle cx="50" cy="50" r="25" fill="#e67e22" stroke="#d35400" stroke-width="4"/>' },
+        
+        // RARES
+        knight: { id: 'knight', name: 'Knight', rarity: 'Rare', cost: 80, dmg: 45, range: 110, cd: 35, projSpeed: 15, color: '#3498db', svg: '<rect x="25" y="25" width="50" height="50" fill="#3498db"/><line x1="50" y1="75" x2="50" y2="5" stroke="#ecf0f1" stroke-width="8"/>' },
+        sniper: { id: 'sniper', name: 'Sniper', rarity: 'Rare', cost: 100, dmg: 80, range: 350, cd: 60, projSpeed: 20, color: '#2c3e50', svg: '<circle cx="50" cy="50" r="30" fill="#2c3e50"/><circle cx="50" cy="50" r="10" fill="#e74c3c"/>' },
+        ninja: { id: 'ninja', name: 'Ninja', rarity: 'Rare', cost: 90, dmg: 30, range: 160, cd: 12, projSpeed: 18, color: '#34495e', svg: '<polygon points="50,10 80,50 50,90 20,50" fill="#34495e"/><circle cx="50" cy="50" r="8" fill="#e74c3c"/>' },
+        mage: { id: 'mage', name: 'Mage', rarity: 'Rare', cost: 120, dmg: 55, range: 200, cd: 45, projSpeed: 7, color: '#9b59b6', svg: '<polygon points="50,20 80,80 20,80" fill="#9b59b6"/><circle cx="50" cy="20" r="10" fill="#8e44ad"/>' },
+        
+        // EPICS
+        paladin: { id: 'paladin', name: 'Paladin', rarity: 'Epic', cost: 180, dmg: 90, range: 130, cd: 40, projSpeed: 15, color: '#f1c40f', svg: '<rect x="20" y="20" width="60" height="60" fill="#f1c40f"/><line x1="50" y1="80" x2="50" y2="0" stroke="#fff" stroke-width="10"/><line x1="20" y1="30" x2="80" y2="30" stroke="#fff" stroke-width="10"/>' },
+        pyro: { id: 'pyro', name: 'Pyromancer', rarity: 'Epic', cost: 160, dmg: 40, range: 180, cd: 8, projSpeed: 12, color: '#e74c3c', svg: '<path d="M50,10 Q80,50 50,90 Q20,50 50,10" fill="#e74c3c"/><circle cx="50" cy="60" r="15" fill="#f1c40f"/>' },
+        frost: { id: 'frost', name: 'Frost Mage', rarity: 'Epic', cost: 170, dmg: 120, range: 220, cd: 70, projSpeed: 5, color: '#00cec9', svg: '<polygon points="50,10 70,50 50,90 30,50" fill="#00cec9"/><polygon points="30,30 70,30 70,70 30,70" fill="none" stroke="#fff" stroke-width="4"/>' },
+        assassin: { id: 'assassin', name: 'Assassin', rarity: 'Epic', cost: 150, dmg: 150, range: 100, cd: 50, projSpeed: 25, color: '#8e44ad', svg: '<polygon points="50,5 90,95 50,75 10,95" fill="#8e44ad"/>' },
+
+        // LEGENDARIES
+        necro: { id: 'necro', name: 'Necromancer', rarity: 'Legendary', cost: 300, dmg: 200, range: 250, cd: 60, projSpeed: 6, color: '#1abc9c', svg: '<rect x="30" y="20" width="40" height="60" fill="#2c3e50"/><circle cx="50" cy="35" r="12" fill="#1abc9c"/><line x1="50" y1="50" x2="50" y2="70" stroke="#1abc9c" stroke-width="4"/>' },
+        valkyrie: { id: 'valkyrie', name: 'Valkyrie', rarity: 'Legendary', cost: 350, dmg: 180, range: 300, cd: 40, projSpeed: 20, color: '#fdcb6e', svg: '<polygon points="20,50 50,10 80,50 50,90" fill="#fdcb6e"/><circle cx="50" cy="50" r="15" fill="#fff"/>' },
+        dragon: { id: 'dragon', name: 'Dragon', rarity: 'Legendary', cost: 500, dmg: 300, range: 200, cd: 30, projSpeed: 10, color: '#d63031', svg: '<polygon points="10,20 90,20 50,90" fill="#d63031"/><circle cx="35" cy="40" r="8" fill="#f1c40f"/><circle cx="65" cy="40" r="8" fill="#f1c40f"/>' },
+        mech: { id: 'mech', name: 'Titan Mech', rarity: 'Legendary', cost: 600, dmg: 500, range: 400, cd: 100, projSpeed: 30, color: '#636e72', svg: '<rect x="15" y="15" width="70" height="70" fill="#636e72" stroke="#2d3436" stroke-width="5"/><circle cx="50" cy="50" r="20" fill="#0984e3"/>' }
+    };
+
+    // --- SAVE DATA MANAGEMENT ---
+    const defaultSave = { shards: 0, unlocked: [], equipped: [], tutorialStep: 0, hasBeatenTutorial: false };
+    let player = JSON.parse(localStorage.getItem('dotr_save')) || { ...defaultSave };
+    
+    // Ensure save data matches new variables if migrating from old save
+    if(player.hasBeatenTutorial === undefined) player.hasBeatenTutorial = false;
+    
+    function saveGame() {
+        localStorage.setItem('dotr_save', JSON.stringify(player));
+        updateShardsUI();
+    }
+
+    function resetSaveData() {
+        if(confirm("Are you sure you want to delete all progress? This wipes your heroes and shards!")) {
+            localStorage.removeItem('dotr_save');
+            player = { ...defaultSave };
+            location.reload();
+        }
+    }
+
+    let invSelection = null; 
+    let difficulty = 'easy';
+
+    const updateShardsUI = () => document.getElementById('shard-count').innerText = player.shards;
+    
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+        document.getElementById(screenId).classList.add('active-screen');
+        
+        // Hide top bar in game
+        document.getElementById('ui-shards').style.display = (screenId === 'screen-game') ? 'none' : 'block';
+        
+        enforceTutorial();
+    }
+
+    function enforceTutorial() {
+        const hint = document.getElementById('menu-hint');
+        const play = document.getElementById('btn-play');
+        const inv = document.getElementById('btn-inventory');
+        const hard = document.getElementById('btn-hard');
+
+        if (player.hasBeatenTutorial) {
+            hint.innerText = "Welcome back Commander!";
+            play.disabled = false; inv.disabled = false; hard.disabled = false;
+        } else {
+            if (player.tutorialStep === 0) {
+                hint.innerText = "Welcome! You must click 'Summon Hero' to get your first unit!";
+                play.disabled = true; inv.disabled = true;
+            } else if (player.tutorialStep === 1) {
+                hint.innerText = "Good! Now go to the 'Barracks' and Equip your Hero.";
+                play.disabled = true; inv.disabled = false;
+            } else if (player.tutorialStep === 2) {
+                hint.innerText = "Excellent. Click 'Play' to start your first battle!";
+                play.disabled = false; inv.disabled = false; hard.disabled = true;
+            }
+        }
+    }
+
+    // --- SUMMONING LOGIC (NO DUPLICATES, WEIGHTED RNG) ---
+    function performSummon() {
+        if (!player.hasBeatenTutorial && player.tutorialStep === 0) {
+            executePull('archer'); // Force common archer first
+            player.tutorialStep = 1; saveGame();
+        } else {
+            if (player.shards >= 100) {
+                // Determine pool of unowned heroes
+                const available = Object.values(HERO_DB).filter(h => !player.unlocked.includes(h.id));
+                if(available.length === 0) return alert("You have unlocked every hero in the game!");
+
+                player.shards -= 100;
+                
+                // Weighting: Common=50, Rare=30, Epic=15, Legendary=5
+                let pool = [];
+                available.forEach(h => {
+                    let weight = 0;
+                    if(h.rarity === 'Common') weight = 50;
+                    if(h.rarity === 'Rare') weight = 30;
+                    if(h.rarity === 'Epic') weight = 15;
+                    if(h.rarity === 'Legendary') weight = 5;
+                    for(let i=0; i<weight; i++) pool.push(h.id);
+                });
+
+                // Select random from weighted pool
+                const pulledId = pool[Math.floor(Math.random() * pool.length)];
+                executePull(pulledId);
+                saveGame();
+            } else alert("Not enough shards! Defeat waves to earn more.");
+        }
+    }
+
+    function executePull(id) {
+        if (!player.unlocked.includes(id)) player.unlocked.push(id);
+        const hero = HERO_DB[id];
+        
+        const card = document.getElementById('summon-result');
+        card.style.display = 'flex';
+        card.className = `card rarity-${hero.rarity}`;
+        
+        document.getElementById('summon-rarity').innerText = hero.rarity;
+        document.getElementById('summon-rarity').style.color = getRarityColor(hero.rarity);
+        document.getElementById('summon-icon').innerHTML = hero.svg;
+        document.getElementById('summon-name').innerText = hero.name;
+        
+        enforceTutorial();
+    }
+
+    function getRarityColor(r) {
+        if(r==='Common') return '#bdc3c7';
+        if(r==='Rare') return '#3498db';
+        if(r==='Epic') return '#9b59b6';
+        if(r==='Legendary') return '#f1c40f';
+        return '#fff';
+    }
+
+    // --- INVENTORY & INDEX ---
+    function openInventory() { showScreen('screen-inventory'); renderInventory(); }
+    
+    function renderInventory() {
+        const grid = document.getElementById('inv-grid'); grid.innerHTML = '';
+        player.unlocked.forEach(id => {
+            const h = HERO_DB[id];
+            const div = document.createElement('div');
+            div.className = `card rarity-${h.rarity} ${player.equipped.includes(id) ? 'equipped' : ''} ${invSelection === id ? 'selected' : ''}`;
+            div.innerHTML = `<div style="font-size:10px; font-weight:bold; color:${getRarityColor(h.rarity)}; margin-bottom:5px;">${h.rarity}</div><svg class="ui-icon" viewBox="0 0 100 100">${h.svg}</svg><div style="font-weight:bold; margin-top:5px; text-align:center; font-size:14px;">${h.name}</div><div style="font-size:12px; color:#aaa;">Cost: ${h.cost}</div>`;
+            div.onclick = () => { invSelection = id; renderInventory(); };
+            grid.appendChild(div);
+        });
+    }
+
+    function openIndex() {
+        showScreen('screen-index');
+        const grid = document.getElementById('index-grid'); grid.innerHTML = '';
+        
+        // Sort by cost to roughly group by tier
+        const allHeroes = Object.values(HERO_DB).sort((a,b) => a.cost - b.cost);
+        
+        allHeroes.forEach(h => {
+            const isOwned = player.unlocked.includes(h.id);
+            const div = document.createElement('div');
+            div.className = `card ${isOwned ? `rarity-${h.rarity}` : 'locked'}`;
+            div.innerHTML = `
+                <div style="font-size:10px; font-weight:bold; color:${isOwned ? getRarityColor(h.rarity) : '#555'}; margin-bottom:5px;">${h.rarity}</div>
+                <svg class="ui-icon" viewBox="0 0 100 100">${h.svg}</svg>
+                <div style="font-weight:bold; margin-top:5px; text-align:center; font-size:14px;">${isOwned ? h.name : '???'}</div>
+                <div style="font-size:12px; color:#aaa;">Cost: ${h.cost}</div>
+            `;
+            grid.appendChild(div);
+        });
+    }
+
+    function equipSelected() {
+        if (!invSelection || player.equipped.includes(invSelection)) return;
+        if (player.equipped.length >= 5) return alert("Max 5 heroes equipped!");
+        player.equipped.push(invSelection);
+        if (!player.hasBeatenTutorial && player.tutorialStep === 1) player.tutorialStep = 2;
+        saveGame(); renderInventory(); enforceTutorial();
+    }
+    
+    function unequipSelected() {
+        if (!invSelection) return;
+        player.equipped = player.equipped.filter(id => id !== invSelection);
+        saveGame(); renderInventory();
+    }
+
+    function setDifficulty(diff) {
+        if (!player.hasBeatenTutorial && diff === 'hard') return;
+        difficulty = diff;
+        document.getElementById('btn-easy').style.borderColor = diff === 'easy' ? 'yellow' : 'transparent';
+        document.getElementById('btn-hard').style.borderColor = diff === 'hard' ? 'yellow' : 'transparent';
+    }
+
+
+    // ==========================================
+    // --- FULLSCREEN GAME ENGINE (NO WASD) ---
+    // ==========================================
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let gameEnv = { gold: 100, lives: 10, wave: 0, active: false, isPaused: false, isEndless: false };
+    let nodes = [], deployedHeroes = [], enemies = [], projectiles = [];
+    let path = [];
+    let loopId, spawnInterval;
+    let selectedHeroToPlace = null;
+    let selectedNodeForUpg = null;
+
+    // Responsive Canvas
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        recalculateMap();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('keydown', e => { if(e.key === 'Escape' && gameEnv.active) togglePause(); });
+
+    function recalculateMap() {
+        const w = canvas.width; const h = canvas.height;
+        path = [
+            {x: 0, y: h*0.3}, {x: w*0.4, y: h*0.3}, {x: w*0.4, y: h*0.7}, 
+            {x: w*0.8, y: h*0.7}, {x: w*0.8, y: h*0.2}, {x: w, y: h*0.2}
+        ];
+        
+        if (nodes.length === 0) {
+            nodes = [
+                { x: w*0.2, y: h*0.2, radius: 40, occupied: null },
+                { x: w*0.3, y: h*0.45, radius: 40, occupied: null },
+                { x: w*0.55, y: h*0.7, radius: 40, occupied: null },
+                { x: w*0.7, y: h*0.5, radius: 40, occupied: null },
+                { x: w*0.85, y: h*0.35, radius: 40, occupied: null },
+                { x: w*0.5, y: h*0.2, radius: 40, occupied: null },
+                { x: w*0.3, y: h*0.8, radius: 40, occupied: null },
+                { x: w*0.7, y: h*0.8, radius: 40, occupied: null }
+            ];
+        }
+    }
+
+    // --- IN-GAME LOGIC ---
+    function startGame() {
+        if (player.equipped.length === 0) return alert("Equip a hero first!");
+        showScreen('screen-game');
+        resizeCanvas();
+        nodes = []; recalculateMap(); 
+        
+        gameEnv = { 
+            gold: difficulty === 'easy' ? 250 : 100, 
+            lives: difficulty === 'easy' ? 20 : 10, 
+            wave: 0, active: true, isPaused: false, isEndless: false 
+        };
+        deployedHeroes = []; enemies = []; projectiles = []; 
+        selectedHeroToPlace = null; selectedNodeForUpg = null;
+        closeUpgradeMenu();
+        
+        buildPlacementBar();
+        updateGameUI();
+        
+        if (!player.hasBeatenTutorial) startInGameTutorial();
+
+        if(loopId) cancelAnimationFrame(loopId);
+        if(spawnInterval) clearInterval(spawnInterval);
+        gameLoop();
+    }
+
+    function buildPlacementBar() {
+        const bar = document.getElementById('placement-bar'); bar.innerHTML = '';
+        player.equipped.forEach(id => {
+            const h = HERO_DB[id];
+            const slot = document.createElement('div');
+            slot.className = `roster-slot rarity-${h.rarity}`;
+            slot.innerHTML = `<svg width="40" height="40" viewBox="0 0 100 100">${h.svg}</svg><span class="roster-cost">${h.cost}g</span>`;
+            slot.onclick = () => {
+                closeUpgradeMenu();
+                if(selectedHeroToPlace === h) { 
+                    selectedHeroToPlace = null;
+                    document.getElementById('placement-helper').style.display = 'none';
+                    slot.classList.remove('active');
+                } else {
+                    document.querySelectorAll('.roster-slot').forEach(el => el.classList.remove('active'));
+                    slot.classList.add('active');
+                    selectedHeroToPlace = h;
+                    document.getElementById('placement-helper').style.display = 'block';
+                    if(!player.hasBeatenTutorial && tutStep === 0) advanceTutorial(1);
+                }
+            };
+            bar.appendChild(slot);
+        });
+    }
+
+    function updateGameUI() {
+        document.getElementById('game-gold').innerText = gameEnv.gold;
+        document.getElementById('game-lives').innerText = gameEnv.lives;
+        document.getElementById('game-wave').innerText = gameEnv.wave;
+    }
+
+    // Interactions (Pure Point and Click)
+    canvas.addEventListener('mousedown', (e) => {
+        if (!gameEnv.active || gameEnv.isPaused) return;
+        const mx = e.clientX; const my = e.clientY;
+
+        let clickedNode = null;
+        nodes.forEach(n => { if (Math.hypot(mx - n.x, my - n.y) < n.radius) clickedNode = n; });
+
+        if (clickedNode) {
+            if (selectedHeroToPlace && !clickedNode.occupied) {
+                // Place Hero directly
+                if (gameEnv.gold >= selectedHeroToPlace.cost) {
+                    gameEnv.gold -= selectedHeroToPlace.cost;
+                    clickedNode.occupied = { 
+                        data: selectedHeroToPlace, 
+                        level: 1, 
+                        invested: selectedHeroToPlace.cost, 
+                        cd: 0,
+                        currentDmg: selectedHeroToPlace.dmg,
+                        currentRange: selectedHeroToPlace.range
+                    };
+                    deployedHeroes.push({ node: clickedNode });
+                    
+                    selectedHeroToPlace = null;
+                    document.querySelectorAll('.roster-slot').forEach(el => el.classList.remove('active'));
+                    document.getElementById('placement-helper').style.display = 'none';
+                    updateGameUI();
+                    if(!player.hasBeatenTutorial && tutStep === 1) advanceTutorial(2);
+                }
+            } else if (clickedNode.occupied && !selectedHeroToPlace) {
+                // Open Upgrade Menu
+                selectedNodeForUpg = clickedNode;
+                openUpgradeMenu();
+            }
+        } else {
+            closeUpgradeMenu();
+        }
+    });
+
+    // --- UPGRADE SYSTEM (EXPONENTIAL COSTS) ---
+    function calcUpgradeCost(hero) {
+        // Multiplier is 1.8 instead of 1.5 to make it steeper
+        return Math.floor(hero.data.cost * Math.pow(1.8, hero.level));
+    }
+
+    function openUpgradeMenu() {
+        const menu = document.getElementById('upgrade-menu');
+        const hero = selectedNodeForUpg.occupied;
+        menu.classList.add('open');
+        document.getElementById('upg-title').innerText = hero.data.name;
+        document.getElementById('upg-lvl').innerText = hero.level;
+        document.getElementById('upg-dmg').innerText = hero.currentDmg;
+        document.getElementById('upg-rng').innerText = hero.currentRange;
+        
+        let upgCost = calcUpgradeCost(hero);
+        let sellVal = Math.floor(hero.invested * 0.6); // 60% return
+        
+        document.getElementById('upg-cost').innerText = upgCost;
+        document.getElementById('sell-val').innerText = sellVal;
+        
+        const btnUpg = document.getElementById('btn-upgrade');
+        if(hero.level >= 5) {
+            btnUpg.innerText = "MAX LEVEL"; btnUpg.disabled = true;
+        } else {
+            btnUpg.innerText = `Upgrade (${upgCost}g)`; 
+            btnUpg.disabled = gameEnv.gold < upgCost;
+        }
+    }
+
+    function closeUpgradeMenu() {
+        document.getElementById('upgrade-menu').classList.remove('open');
+        selectedNodeForUpg = null;
+    }
+
+    function buyUpgrade() {
+        if(!selectedNodeForUpg) return;
+        const hero = selectedNodeForUpg.occupied;
+        let upgCost = calcUpgradeCost(hero);
+        
+        if (gameEnv.gold >= upgCost && hero.level < 5) {
+            gameEnv.gold -= upgCost;
+            hero.invested += upgCost;
+            hero.level++;
+            hero.currentDmg = Math.floor(hero.currentDmg * 1.5);
+            hero.currentRange = Math.floor(hero.currentRange * 1.15);
+            updateGameUI(); openUpgradeMenu(); 
+            
+            if(!player.hasBeatenTutorial && tutStep === 3) advanceTutorial(4);
+        }
+    }
+
+    function sellTower() {
+        if(!selectedNodeForUpg) return;
+        const hero = selectedNodeForUpg.occupied;
+        let sellVal = Math.floor(hero.invested * 0.6);
+        gameEnv.gold += sellVal;
+        
+        deployedHeroes = deployedHeroes.filter(dh => dh.node !== selectedNodeForUpg);
+        selectedNodeForUpg.occupied = null;
+        
+        updateGameUI(); closeUpgradeMenu();
+    }
+
+
+    // --- WAVES & GAME FLOW ---
+    function startWave() {
+        if (enemies.length > 0) return; 
+        if(!player.hasBeatenTutorial && tutStep === 2) advanceTutorial(3);
+
+        gameEnv.wave++; updateGameUI();
+        
+        let count = 0;
+        let total = 10 + (gameEnv.wave * 5);
+        let diffMult = difficulty === 'hard' ? 1.6 : 1;
+        
+        spawnInterval = setInterval(() => {
+            if (count >= total || !gameEnv.active || gameEnv.isPaused) {
+                if(count >= total) clearInterval(spawnInterval);
+                return; 
+            }
+            enemies.push({ 
+                x: path[0].x, y: path[0].y, targetIdx: 1, 
+                speed: 1.5 + (gameEnv.wave*0.1), 
+                hp: (30 + gameEnv.wave * 35) * diffMult, 
+                maxHp: (30 + gameEnv.wave * 35) * diffMult,
+                size: 14 + Math.random()*5
+            });
+            count++;
+        }, Math.max(200, 800 - (gameEnv.wave*20))); // Gets very fast
+    }
+
+    function togglePause() {
+        gameEnv.isPaused = !gameEnv.isPaused;
+        document.getElementById('pause-overlay').style.display = gameEnv.isPaused ? 'flex' : 'none';
+    }
+
+    function exitToMenu() {
+        gameEnv.active = false;
+        document.getElementById('pause-overlay').style.display = 'none';
+        document.getElementById('endless-overlay').style.display = 'none';
+        showScreen('screen-menu');
+        saveGame();
+    }
+
+    function triggerVictory() {
+        gameEnv.isPaused = true;
+        player.shards += 300; saveGame();
+        document.getElementById('endless-overlay').style.display = 'flex';
+    }
+
+    function continueEndless() {
+        gameEnv.isEndless = true;
+        gameEnv.isPaused = false;
+        document.getElementById('endless-overlay').style.display = 'none';
+    }
+
+
+    // --- GAME LOOP & DRAWING ---
+    function gameLoop() {
+        if (!gameEnv.active) return;
+        if (!gameEnv.isPaused) updateEngine();
+        drawEngine();
+        loopId = requestAnimationFrame(gameLoop);
+    }
+
+    function updateEngine() {
+        // 1. Move Enemies
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            let e = enemies[i];
+            let t = path[e.targetIdx];
+            let dist = Math.hypot(t.x - e.x, t.y - e.y);
+            if (dist < e.speed) {
+                e.x = t.x; e.y = t.y;
+                e.targetIdx++;
+                if (e.targetIdx >= path.length) {
+                    gameEnv.lives--; updateGameUI();
+                    enemies.splice(i, 1);
+                    if (gameEnv.lives <= 0) { alert("Base Destroyed!"); exitToMenu(); return; }
+                }
+            } else {
+                e.x += (t.x - e.x) / dist * e.speed; e.y += (t.y - e.y) / dist * e.speed;
+            }
+        }
+
+        // 2. Towers Shoot
+        deployedHeroes.forEach(dh => {
+            let hero = dh.node.occupied;
+            if (hero.cd > 0) hero.cd--;
+            else {
+                let target = null; let minDist = hero.currentRange;
+                enemies.forEach(e => {
+                    let d = Math.hypot(e.x - dh.node.x, e.y - dh.node.y);
+                    if (d < minDist) { minDist = d; target = e; }
+                });
+                if (target) {
+                    hero.cd = hero.data.cd;
+                    projectiles.push({ x: dh.node.x, y: dh.node.y, target: target, dmg: hero.currentDmg, speed: hero.data.projSpeed, color: hero.data.color });
+                }
+            }
+        });
+
+        // 3. Projectiles
+        for (let i = projectiles.length - 1; i >= 0; i--) {
+            let p = projectiles[i];
+            if (!enemies.includes(p.target)) { projectiles.splice(i, 1); continue; }
+            let dist = Math.hypot(p.target.x - p.x, p.target.y - p.y);
+            if (dist < p.speed) {
+                p.target.hp -= p.dmg;
+                if (p.target.hp <= 0) {
+                    gameEnv.gold += 15 + Math.floor(gameEnv.wave*3); updateGameUI();
+                    let idx = enemies.indexOf(p.target);
+                    if (idx > -1) enemies.splice(idx, 1);
+                    player.shards += 1; 
+                    
+                    if (!gameEnv.isEndless && gameEnv.wave >= 20 && enemies.length === 0) {
+                        setTimeout(triggerVictory, 1000);
+                    }
+                }
+                projectiles.splice(i, 1);
+            } else {
+                p.x += (p.target.x - p.x) / dist * p.speed;
+                p.y += (p.target.y - p.y) / dist * p.speed;
+            }
+        }
+
+        // Live refresh upgrade button
+        if(selectedNodeForUpg) {
+            let upgCost = calcUpgradeCost(selectedNodeForUpg.occupied);
+            document.getElementById('btn-upgrade').disabled = (gameEnv.gold < upgCost || selectedNodeForUpg.occupied.level >= 5);
+        }
+    }
+
+    // --- RENDER ---
+    function drawEngine() {
+        ctx.fillStyle = '#1e2d24'; 
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = "rgba(255,255,255,0.05)";
+        for(let x=0; x<canvas.width; x+=50) {
+            for(let y=0; y<canvas.height; y+=50) {
+                ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI*2); ctx.fill();
+            }
+        }
+
+        ctx.strokeStyle = "#5a4d41"; ctx.lineWidth = 55; ctx.lineJoin = "round"; ctx.lineCap = "round";
+        ctx.beginPath(); ctx.moveTo(path[0].x, path[0].y);
+        for(let i=1; i<path.length; i++) ctx.lineTo(path[i].x, path[i].y);
+        ctx.stroke();
+
+        const base = path[path.length-1];
+        ctx.fillStyle = '#3498db'; ctx.beginPath(); ctx.arc(base.x, base.y, 45, 0, Math.PI*2); ctx.fill();
+
+        nodes.forEach(n => {
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.beginPath(); ctx.arc(n.x, n.y, n.radius, 0, Math.PI*2); ctx.fill();
+            
+            if (!n.occupied && selectedHeroToPlace) {
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = gameEnv.gold >= selectedHeroToPlace.cost ? "#2ecc71" : "#e74c3c";
+                ctx.stroke();
+            }
+
+            if (n.occupied) {
+                // Draw SVG equivalent for hero
+                drawHeroGraphic(n.occupied.data, n.x, n.y);
+                
+                ctx.fillStyle = "#f1c40f";
+                for(let l=0; l<n.occupied.level; l++) {
+                    ctx.fillRect(n.x - 15 + (l*8), n.y + 25, 6, 6);
+                }
+
+                if (selectedNodeForUpg === n) {
+                    ctx.strokeStyle = "rgba(255, 255, 255, 0.25)"; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.arc(n.x, n.y, n.occupied.currentRange, 0, Math.PI*2); ctx.stroke();
+                    ctx.strokeStyle = "#f1c40f"; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(n.x, n.y, n.radius+2, 0, Math.PI*2); ctx.stroke();
+                }
+            }
+        });
+
+        enemies.forEach(e => {
+            ctx.fillStyle = "#e74c3c"; ctx.beginPath(); ctx.arc(e.x, e.y, e.size, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "black"; ctx.fillRect(e.x - 15, e.y - 25, 30, 5);
+            ctx.fillStyle = "#2ecc71"; ctx.fillRect(e.x - 15, e.y - 25, 30 * (e.hp / e.maxHp), 5);
+        });
+
+        projectiles.forEach(p => {
+            ctx.fillStyle = p.color; ctx.shadowBlur = 15; ctx.shadowColor = p.color;
+            ctx.beginPath(); ctx.arc(p.x, p.y, 7, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur = 0;
+        });
+    }
+
+    function drawHeroGraphic(data, x, y) {
+        // Fallback simple rendering using their color, since full SVG parser on canvas is heavy
+        ctx.fillStyle = data.color;
+        ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI*2); ctx.fill();
+        ctx.lineWidth = 4; ctx.strokeStyle = getRarityColor(data.rarity); ctx.stroke();
+        
+        ctx.fillStyle = "white"; ctx.font = "bold 14px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText(data.name.substring(0, 3).toUpperCase(), x, y);
+    }
+
+    // --- IN-GAME TUTORIAL FLOW ---
+    let tutStep = 0;
+    function startInGameTutorial() {
+        const box = document.getElementById('tutorial-box');
+        box.style.display = 'block';
+        tutStep = 0; updateTutText();
+    }
+    
+    function advanceTutorial(step) {
+        if(player.hasBeatenTutorial) return;
+        tutStep = step; updateTutText();
+        if(step === 4) {
+            setTimeout(() => { 
+                document.getElementById('tutorial-box').style.display = 'none'; 
+                player.hasBeatenTutorial = true; saveGame();
+            }, 3000);
+        }
+    }
+
+    function updateTutText() {
+        const box = document.getElementById('tutorial-box');
+        if(tutStep === 0) box.innerText = "Click a Hero in the bottom bar to select them.";
+        if(tutStep === 1) box.innerText = "Click any Dark Circle (Node) to place the Hero!";
+        if(tutStep === 2) box.innerText = "Great! Now click 'Start Wave' on the left.";
+        if(tutStep === 3) box.innerText = "Click on your placed Hero to open the Upgrade Menu!";
+        if(tutStep === 4) box.innerText = "Keep placing and upgrading. Defend the base!";
+    }
+
+    // Boot
+    updateShardsUI();
+    enforceTutorial();
+</script>
+</body>
+</html>
