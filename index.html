@@ -170,26 +170,32 @@
         sniper: { id: 'sniper', name: 'Sniper', rarity: 'Rare', cost: 100, dmg: 80, range: 350, cd: 60, projSpeed: 20, color: '#2c3e50', svg: '<circle cx="50" cy="50" r="30" fill="#2c3e50"/><circle cx="50" cy="50" r="10" fill="#e74c3c"/>' },
         ninja: { id: 'ninja', name: 'Ninja', rarity: 'Rare', cost: 90, dmg: 30, range: 160, cd: 12, projSpeed: 18, color: '#34495e', svg: '<polygon points="50,10 80,50 50,90 20,50" fill="#34495e"/><circle cx="50" cy="50" r="8" fill="#e74c3c"/>' },
         mage: { id: 'mage', name: 'Mage', rarity: 'Rare', cost: 120, dmg: 55, range: 200, cd: 45, projSpeed: 7, color: '#9b59b6', svg: '<polygon points="50,20 80,80 20,80" fill="#9b59b6"/><circle cx="50" cy="20" r="10" fill="#8e44ad"/>' },
-        
+        gunner: { id: 'gunner', name: 'Gunner', rarity: 'Rare', cost: 110, dmg: 20, range: 140, cd: 8, projSpeed: 25, color: '#f39c12', svg: '<rect x="40" y="20" width="20" height="60" fill="#f39c12"/><circle cx="50" cy="20" r="8" fill="#fff"/>' },
+
         // EPICS
         paladin: { id: 'paladin', name: 'Paladin', rarity: 'Epic', cost: 180, dmg: 90, range: 130, cd: 40, projSpeed: 15, color: '#f1c40f', svg: '<rect x="20" y="20" width="60" height="60" fill="#f1c40f"/><line x1="50" y1="80" x2="50" y2="0" stroke="#fff" stroke-width="10"/><line x1="20" y1="30" x2="80" y2="30" stroke="#fff" stroke-width="10"/>' },
         pyro: { id: 'pyro', name: 'Pyromancer', rarity: 'Epic', cost: 160, dmg: 40, range: 180, cd: 8, projSpeed: 12, color: '#e74c3c', svg: '<path d="M50,10 Q80,50 50,90 Q20,50 50,10" fill="#e74c3c"/><circle cx="50" cy="60" r="15" fill="#f1c40f"/>' },
         frost: { id: 'frost', name: 'Frost Mage', rarity: 'Epic', cost: 170, dmg: 120, range: 220, cd: 70, projSpeed: 5, color: '#00cec9', svg: '<polygon points="50,10 70,50 50,90 30,50" fill="#00cec9"/><polygon points="30,30 70,30 70,70 30,70" fill="none" stroke="#fff" stroke-width="4"/>' },
         assassin: { id: 'assassin', name: 'Assassin', rarity: 'Epic', cost: 150, dmg: 150, range: 100, cd: 50, projSpeed: 25, color: '#8e44ad', svg: '<polygon points="50,5 90,95 50,75 10,95" fill="#8e44ad"/>' },
+        templar: { id: 'templar', name: 'Templar', rarity: 'Epic', cost: 200, dmg: 110, range: 150, cd: 35, projSpeed: 20, color: '#ecf0f1', svg: '<circle cx="50" cy="50" r="35" fill="#ecf0f1"/><line x1="50" y1="20" x2="50" y2="80" stroke="#c0392b" stroke-width="8"/><line x1="20" y1="50" x2="80" y2="50" stroke="#c0392b" stroke-width="8"/>' },
+        alchemist: { id: 'alchemist', name: 'Alchemist', rarity: 'Epic', cost: 190, dmg: 60, range: 190, cd: 25, projSpeed: 9, color: '#27ae60', svg: '<polygon points="50,20 80,80 20,80" fill="#27ae60"/><rect x="40" y="5" width="20" height="20" fill="#fff"/>' },
 
         // LEGENDARIES
         necro: { id: 'necro', name: 'Necromancer', rarity: 'Legendary', cost: 300, dmg: 200, range: 250, cd: 60, projSpeed: 6, color: '#1abc9c', svg: '<rect x="30" y="20" width="40" height="60" fill="#2c3e50"/><circle cx="50" cy="35" r="12" fill="#1abc9c"/><line x1="50" y1="50" x2="50" y2="70" stroke="#1abc9c" stroke-width="4"/>' },
         valkyrie: { id: 'valkyrie', name: 'Valkyrie', rarity: 'Legendary', cost: 350, dmg: 180, range: 300, cd: 40, projSpeed: 20, color: '#fdcb6e', svg: '<polygon points="20,50 50,10 80,50 50,90" fill="#fdcb6e"/><circle cx="50" cy="50" r="15" fill="#fff"/>' },
         dragon: { id: 'dragon', name: 'Dragon', rarity: 'Legendary', cost: 500, dmg: 300, range: 200, cd: 30, projSpeed: 10, color: '#d63031', svg: '<polygon points="10,20 90,20 50,90" fill="#d63031"/><circle cx="35" cy="40" r="8" fill="#f1c40f"/><circle cx="65" cy="40" r="8" fill="#f1c40f"/>' },
-        mech: { id: 'mech', name: 'Titan Mech', rarity: 'Legendary', cost: 600, dmg: 500, range: 400, cd: 100, projSpeed: 30, color: '#636e72', svg: '<rect x="15" y="15" width="70" height="70" fill="#636e72" stroke="#2d3436" stroke-width="5"/><circle cx="50" cy="50" r="20" fill="#0984e3"/>' }
+        mech: { id: 'mech', name: 'Titan Mech', rarity: 'Legendary', cost: 600, dmg: 500, range: 400, cd: 100, projSpeed: 30, color: '#636e72', svg: '<rect x="15" y="15" width="70" height="70" fill="#636e72" stroke="#2d3436" stroke-width="5"/><circle cx="50" cy="50" r="20" fill="#0984e3"/>' },
+        voidlord: { id: 'voidlord', name: 'Void Lord', rarity: 'Legendary', cost: 750, dmg: 800, range: 350, cd: 90, projSpeed: 40, color: '#000000', svg: '<circle cx="50" cy="50" r="40" fill="#000"/><circle cx="50" cy="50" r="15" fill="#9b59b6"/>' }
     };
 
     // --- SAVE DATA MANAGEMENT ---
     const defaultSave = { shards: 0, unlocked: [], equipped: [], tutorialStep: 0, hasBeatenTutorial: false };
     let player = JSON.parse(localStorage.getItem('dotr_save')) || { ...defaultSave };
     
-    // Ensure save data matches new variables if migrating from old save
+    // BULLETPROOF SAVE FIX: Clean ghost heroes!
     if(player.hasBeatenTutorial === undefined) player.hasBeatenTutorial = false;
+    player.unlocked = player.unlocked.filter(id => HERO_DB[id]);
+    player.equipped = player.equipped.filter(id => HERO_DB[id]);
     
     function saveGame() {
         localStorage.setItem('dotr_save', JSON.stringify(player));
@@ -242,20 +248,34 @@
         }
     }
 
-    // --- SUMMONING LOGIC (NO DUPLICATES, WEIGHTED RNG) ---
+    // --- CHEAT CODE: D-U-C-K ---
+    let secretBuffer = [];
+    window.addEventListener('keydown', (e) => {
+        secretBuffer.push(e.key.toLowerCase());
+        if (secretBuffer.length > 4) secretBuffer.shift(); 
+        
+        if (secretBuffer.join('') === 'duck') {
+            player.shards += 10000;
+            player.unlocked = Object.keys(HERO_DB);
+            player.hasBeatenTutorial = true;
+            saveGame();
+            alert("🦆 QUACK! Developer Cheat Activated!\nYou received 10,000 Shards and Unlocked Every Hero!");
+            secretBuffer = []; 
+            location.reload(); // Reload to update UI instantly
+        }
+    });
+
+    // --- SUMMONING LOGIC ---
     function performSummon() {
         if (!player.hasBeatenTutorial && player.tutorialStep === 0) {
             executePull('archer'); // Force common archer first
             player.tutorialStep = 1; saveGame();
         } else {
             if (player.shards >= 100) {
-                // Determine pool of unowned heroes
                 const available = Object.values(HERO_DB).filter(h => !player.unlocked.includes(h.id));
                 if(available.length === 0) return alert("You have unlocked every hero in the game!");
 
                 player.shards -= 100;
-                
-                // Weighting: Common=50, Rare=30, Epic=15, Legendary=5
                 let pool = [];
                 available.forEach(h => {
                     let weight = 0;
@@ -266,7 +286,6 @@
                     for(let i=0; i<weight; i++) pool.push(h.id);
                 });
 
-                // Select random from weighted pool
                 const pulledId = pool[Math.floor(Math.random() * pool.length)];
                 executePull(pulledId);
                 saveGame();
@@ -316,8 +335,6 @@
     function openIndex() {
         showScreen('screen-index');
         const grid = document.getElementById('index-grid'); grid.innerHTML = '';
-        
-        // Sort by cost to roughly group by tier
         const allHeroes = Object.values(HERO_DB).sort((a,b) => a.cost - b.cost);
         
         allHeroes.forEach(h => {
@@ -357,19 +374,18 @@
 
 
     // ==========================================
-    // --- FULLSCREEN GAME ENGINE (NO WASD) ---
+    // --- FULLSCREEN GAME ENGINE ---
     // ==========================================
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
     let gameEnv = { gold: 100, lives: 10, wave: 0, active: false, isPaused: false, isEndless: false };
-    let nodes = [], deployedHeroes = [], enemies = [], projectiles = [];
+    let nodes = [], deployedHeroes = [], enemies = [], projectiles = [], particles = [];
     let path = [];
     let loopId, spawnInterval;
     let selectedHeroToPlace = null;
     let selectedNodeForUpg = null;
 
-    // Responsive Canvas
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -399,7 +415,18 @@
         }
     }
 
-    // --- IN-GAME LOGIC ---
+    // Particle System
+    function spawnParticles(x, y, color, count) {
+        for(let i=0; i<count; i++) {
+            particles.push({
+                x: x, y: y,
+                vx: (Math.random() - 0.5) * 8,
+                vy: (Math.random() - 0.5) * 8,
+                life: 1.0, color: color, size: Math.random() * 4 + 2
+            });
+        }
+    }
+
     function startGame() {
         if (player.equipped.length === 0) return alert("Equip a hero first!");
         showScreen('screen-game');
@@ -411,7 +438,7 @@
             lives: difficulty === 'easy' ? 20 : 10, 
             wave: 0, active: true, isPaused: false, isEndless: false 
         };
-        deployedHeroes = []; enemies = []; projectiles = []; 
+        deployedHeroes = []; enemies = []; projectiles = []; particles = [];
         selectedHeroToPlace = null; selectedNodeForUpg = null;
         closeUpgradeMenu();
         
@@ -456,7 +483,6 @@
         document.getElementById('game-wave').innerText = gameEnv.wave;
     }
 
-    // Interactions (Pure Point and Click)
     canvas.addEventListener('mousedown', (e) => {
         if (!gameEnv.active || gameEnv.isPaused) return;
         const mx = e.clientX; const my = e.clientY;
@@ -466,16 +492,11 @@
 
         if (clickedNode) {
             if (selectedHeroToPlace && !clickedNode.occupied) {
-                // Place Hero directly
                 if (gameEnv.gold >= selectedHeroToPlace.cost) {
                     gameEnv.gold -= selectedHeroToPlace.cost;
                     clickedNode.occupied = { 
-                        data: selectedHeroToPlace, 
-                        level: 1, 
-                        invested: selectedHeroToPlace.cost, 
-                        cd: 0,
-                        currentDmg: selectedHeroToPlace.dmg,
-                        currentRange: selectedHeroToPlace.range
+                        data: selectedHeroToPlace, level: 1, invested: selectedHeroToPlace.cost, 
+                        cd: 0, currentDmg: selectedHeroToPlace.dmg, currentRange: selectedHeroToPlace.range
                     };
                     deployedHeroes.push({ node: clickedNode });
                     
@@ -486,7 +507,6 @@
                     if(!player.hasBeatenTutorial && tutStep === 1) advanceTutorial(2);
                 }
             } else if (clickedNode.occupied && !selectedHeroToPlace) {
-                // Open Upgrade Menu
                 selectedNodeForUpg = clickedNode;
                 openUpgradeMenu();
             }
@@ -495,25 +515,29 @@
         }
     });
 
-    // --- UPGRADE SYSTEM (EXPONENTIAL COSTS) ---
+    // --- UPGRADE SYSTEM ---
     function calcUpgradeCost(hero) {
-        // Multiplier is 1.8 instead of 1.5 to make it steeper
         return Math.floor(hero.data.cost * Math.pow(1.8, hero.level));
     }
 
     function openUpgradeMenu() {
         const menu = document.getElementById('upgrade-menu');
-        const hero = selectedNodeForUpg.occupied;
         menu.classList.add('open');
+        refreshUpgradeUI();
+    }
+
+    function refreshUpgradeUI() {
+        if(!selectedNodeForUpg) return;
+        const hero = selectedNodeForUpg.occupied;
+        
         document.getElementById('upg-title').innerText = hero.data.name;
         document.getElementById('upg-lvl').innerText = hero.level;
         document.getElementById('upg-dmg').innerText = hero.currentDmg;
         document.getElementById('upg-rng').innerText = hero.currentRange;
         
         let upgCost = calcUpgradeCost(hero);
-        let sellVal = Math.floor(hero.invested * 0.6); // 60% return
+        let sellVal = Math.floor(hero.invested * 0.6); 
         
-        document.getElementById('upg-cost').innerText = upgCost;
         document.getElementById('sell-val').innerText = sellVal;
         
         const btnUpg = document.getElementById('btn-upgrade');
@@ -541,7 +565,7 @@
             hero.level++;
             hero.currentDmg = Math.floor(hero.currentDmg * 1.5);
             hero.currentRange = Math.floor(hero.currentRange * 1.15);
-            updateGameUI(); openUpgradeMenu(); 
+            updateGameUI(); refreshUpgradeUI(); 
             
             if(!player.hasBeatenTutorial && tutStep === 3) advanceTutorial(4);
         }
@@ -560,7 +584,7 @@
     }
 
 
-    // --- WAVES & GAME FLOW ---
+    // --- ADVANCED WAVE GENERATION ---
     function startWave() {
         if (enemies.length > 0) return; 
         if(!player.hasBeatenTutorial && tutStep === 2) advanceTutorial(3);
@@ -576,15 +600,29 @@
                 if(count >= total) clearInterval(spawnInterval);
                 return; 
             }
+
+            // Enemy Type selection based on wave progress
+            let eType = "Normal";
+            let color = "#e74c3c";
+            let spd = 1.5 + (gameEnv.wave*0.1);
+            let hp = (30 + gameEnv.wave * 35) * diffMult;
+            let sz = 14;
+
+            let rand = Math.random();
+            if (gameEnv.wave >= 15 && count % 15 === 0) {
+                eType = "Boss"; color = "#8e44ad"; spd *= 0.5; hp *= 8; sz = 30;
+            } else if (gameEnv.wave >= 10 && rand > 0.7) {
+                eType = "Tank"; color = "#7f8c8d"; spd *= 0.6; hp *= 3; sz = 20;
+            } else if (gameEnv.wave >= 5 && rand > 0.5) {
+                eType = "Sprinter"; color = "#f1c40f"; spd *= 1.8; hp *= 0.5; sz = 10;
+            }
+
             enemies.push({ 
-                x: path[0].x, y: path[0].y, targetIdx: 1, 
-                speed: 1.5 + (gameEnv.wave*0.1), 
-                hp: (30 + gameEnv.wave * 35) * diffMult, 
-                maxHp: (30 + gameEnv.wave * 35) * diffMult,
-                size: 14 + Math.random()*5
+                x: path[0].x, y: path[0].y, targetIdx: 1, type: eType,
+                speed: spd, hp: hp, maxHp: hp, size: sz, color: color, isDead: false
             });
             count++;
-        }, Math.max(200, 800 - (gameEnv.wave*20))); // Gets very fast
+        }, Math.max(200, 800 - (gameEnv.wave*20))); 
     }
 
     function togglePause() {
@@ -612,8 +650,7 @@
         document.getElementById('endless-overlay').style.display = 'none';
     }
 
-
-    // --- GAME LOOP & DRAWING ---
+    // --- GAME LOOP & ENGINE ---
     function gameLoop() {
         if (!gameEnv.active) return;
         if (!gameEnv.isPaused) updateEngine();
@@ -622,9 +659,13 @@
     }
 
     function updateEngine() {
+        // Live Upgrade UI Sync Fix
+        if(selectedNodeForUpg) refreshUpgradeUI();
+
         // 1. Move Enemies
         for (let i = enemies.length - 1; i >= 0; i--) {
             let e = enemies[i];
+            if(e.isDead) continue;
             let t = path[e.targetIdx];
             let dist = Math.hypot(t.x - e.x, t.y - e.y);
             if (dist < e.speed) {
@@ -632,7 +673,7 @@
                 e.targetIdx++;
                 if (e.targetIdx >= path.length) {
                     gameEnv.lives--; updateGameUI();
-                    enemies.splice(i, 1);
+                    e.isDead = true;
                     if (gameEnv.lives <= 0) { alert("Base Destroyed!"); exitToMenu(); return; }
                 }
             } else {
@@ -647,32 +688,36 @@
             else {
                 let target = null; let minDist = hero.currentRange;
                 enemies.forEach(e => {
+                    if (e.isDead) return;
                     let d = Math.hypot(e.x - dh.node.x, e.y - dh.node.y);
                     if (d < minDist) { minDist = d; target = e; }
                 });
                 if (target) {
                     hero.cd = hero.data.cd;
+                    // Muzzle flash particles
+                    spawnParticles(dh.node.x, dh.node.y, '#f1c40f', 3);
                     projectiles.push({ x: dh.node.x, y: dh.node.y, target: target, dmg: hero.currentDmg, speed: hero.data.projSpeed, color: hero.data.color });
                 }
             }
         });
 
-        // 3. Projectiles
+        // 3. Projectiles & Collision (GHOST ENEMY FIX)
         for (let i = projectiles.length - 1; i >= 0; i--) {
             let p = projectiles[i];
-            if (!enemies.includes(p.target)) { projectiles.splice(i, 1); continue; }
+            if (p.target.isDead) { projectiles.splice(i, 1); continue; }
+            
             let dist = Math.hypot(p.target.x - p.x, p.target.y - p.y);
             if (dist < p.speed) {
                 p.target.hp -= p.dmg;
-                if (p.target.hp <= 0) {
-                    gameEnv.gold += 15 + Math.floor(gameEnv.wave*3); updateGameUI();
-                    let idx = enemies.indexOf(p.target);
-                    if (idx > -1) enemies.splice(idx, 1);
-                    player.shards += 1; 
+                
+                if (p.target.hp <= 0 && !p.target.isDead) {
+                    p.target.isDead = true; // Mark dead, do NOT splice immediately
+                    let goldReward = p.target.type === 'Boss' ? 100 : (p.target.type === 'Tank' ? 25 : 15);
+                    gameEnv.gold += goldReward + Math.floor(gameEnv.wave*3); 
+                    player.shards += (p.target.type === 'Boss' ? 5 : 1);
                     
-                    if (!gameEnv.isEndless && gameEnv.wave >= 20 && enemies.length === 0) {
-                        setTimeout(triggerVictory, 1000);
-                    }
+                    spawnParticles(p.target.x, p.target.y, p.target.color, p.target.type === 'Boss' ? 30 : 10);
+                    updateGameUI();
                 }
                 projectiles.splice(i, 1);
             } else {
@@ -681,10 +726,23 @@
             }
         }
 
-        // Live refresh upgrade button
-        if(selectedNodeForUpg) {
-            let upgCost = calcUpgradeCost(selectedNodeForUpg.occupied);
-            document.getElementById('btn-upgrade').disabled = (gameEnv.gold < upgCost || selectedNodeForUpg.occupied.level >= 5);
+        // Safe array cleanup
+        enemies = enemies.filter(e => !e.isDead);
+
+        // Win check
+        if (!gameEnv.isEndless && gameEnv.wave >= 20 && enemies.length === 0) {
+            // Give interval time to clear
+            if(!spawnInterval || spawnInterval._idleTimeout === -1) {
+               setTimeout(triggerVictory, 1000);
+            }
+        }
+
+        // 4. Update Particles
+        for(let i = particles.length - 1; i >= 0; i--) {
+            let p = particles[i];
+            p.x += p.vx; p.y += p.vy;
+            p.life -= 0.05;
+            if(p.life <= 0) particles.splice(i, 1);
         }
     }
 
@@ -719,7 +777,6 @@
             }
 
             if (n.occupied) {
-                // Draw SVG equivalent for hero
                 drawHeroGraphic(n.occupied.data, n.x, n.y);
                 
                 ctx.fillStyle = "#f1c40f";
@@ -736,7 +793,7 @@
         });
 
         enemies.forEach(e => {
-            ctx.fillStyle = "#e74c3c"; ctx.beginPath(); ctx.arc(e.x, e.y, e.size, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = e.color; ctx.beginPath(); ctx.arc(e.x, e.y, e.size, 0, Math.PI*2); ctx.fill();
             ctx.fillStyle = "black"; ctx.fillRect(e.x - 15, e.y - 25, 30, 5);
             ctx.fillStyle = "#2ecc71"; ctx.fillRect(e.x - 15, e.y - 25, 30 * (e.hp / e.maxHp), 5);
         });
@@ -746,10 +803,16 @@
             ctx.beginPath(); ctx.arc(p.x, p.y, 7, 0, Math.PI*2); ctx.fill();
             ctx.shadowBlur = 0;
         });
+
+        particles.forEach(p => {
+            ctx.globalAlpha = Math.max(0, p.life);
+            ctx.fillStyle = p.color;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+            ctx.globalAlpha = 1.0;
+        });
     }
 
     function drawHeroGraphic(data, x, y) {
-        // Fallback simple rendering using their color, since full SVG parser on canvas is heavy
         ctx.fillStyle = data.color;
         ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI*2); ctx.fill();
         ctx.lineWidth = 4; ctx.strokeStyle = getRarityColor(data.rarity); ctx.stroke();
@@ -761,6 +824,7 @@
     // --- IN-GAME TUTORIAL FLOW ---
     let tutStep = 0;
     function startInGameTutorial() {
+        if(player.hasBeatenTutorial) return;
         const box = document.getElementById('tutorial-box');
         box.style.display = 'block';
         tutStep = 0; updateTutText();
