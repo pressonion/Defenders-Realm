@@ -48,14 +48,15 @@
         .roster-slot.active { border-color: #f1c40f; box-shadow: 0 0 15px #f1c40f; background: #2a2510; }
         .roster-cost { position: absolute; bottom: -20px; font-size: 14px; font-weight: bold; color: gold; text-shadow: 1px 1px 2px #000;}
 
-        /* SCROLLBAR FIX */
+        /* Upgrade Menu */
         #upgrade-menu { position: absolute; right: 0; top: 50%; transform: translate(100%, -50%); width: 250px; background: rgba(11,12,16,0.95); border: 2px solid #66fcf1; border-radius: 10px 0 0 10px; display: flex; flex-direction: column; padding: 20px; z-index: 6; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);}
         #upgrade-menu.open { transform: translate(0, -50%); }
-        
         .upg-stat { margin-bottom: 10px; font-size: 16px; color: #c5c6c7;}
         
         .overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; }
         
+        #tutorial-box { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); background: rgba(11, 12, 16, 0.95); border: 3px solid #66fcf1; padding: 20px; border-radius: 10px; z-index: 50; text-align: center; font-size: 18px; display: none; box-shadow: 0 0 20px rgba(0,0,0,0.8);}
+
         /* Summon Animation Styles */
         #summon-anim-container { display: none; flex-direction: column; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; }
         .portal { width: 150px; height: 150px; border-radius: 50%; border: 10px dashed #9b59b6; animation: spin 2s linear infinite, glow 1s ease-in-out infinite alternate; }
@@ -154,10 +155,13 @@
             <div class="upg-stat">Damage: <span id="upg-dmg">0</span></div>
             <div class="upg-stat">Range: <span id="upg-rng">0</span></div>
             <hr style="border-color: #45a29e; width: 100%;">
+            <button class="btn" id="btn-merge" onclick="mergeTower()" style="font-size: 14px; padding: 10px; border-color: #9b59b6; color: #9b59b6; display: none; width: 90%; margin: 5px auto;">Merge (3)</button>
             <button class="btn" id="btn-upgrade" onclick="buyUpgrade()" style="font-size: 14px; padding: 10px;">Upgrade (<span id="upg-cost">50</span>g)</button>
             <button class="btn" id="btn-sell" onclick="sellTower()" style="font-size: 14px; padding: 10px; border-color: #e74c3c; color: #e74c3c;">Sell (<span id="sell-val">25</span>g)</button>
             <button class="btn" onclick="closeUpgradeMenu()" style="font-size: 12px; padding: 5px; border-color: #555;">Close</button>
         </div>
+
+        <div id="tutorial-box"></div>
     </div>
 
     <div id="pause-overlay" class="overlay">
@@ -175,14 +179,21 @@
 </div>
 
 <script>
+// ==========================================
+// ANTI-CHEAT ENCRYPTION VAULT (IIFE)
+// ==========================================
+(() => {
+    
     // --- MASSIVE HERO DATABASE ---
     const HERO_DB = {
         // COMMONS
         peasant: { id: 'peasant', name: 'Peasant', rarity: 'Common', cost: 15, dmg: 5, range: 80, cd: 30, projSpeed: 5, color: '#bdc3c7', svg: '<rect x="40" y="40" width="20" height="20" fill="#bdc3c7"/>' },
         militia: { id: 'militia', name: 'Militia', rarity: 'Common', cost: 30, dmg: 10, range: 120, cd: 25, projSpeed: 8, color: '#95a5a6', svg: '<rect x="35" y="35" width="30" height="30" fill="#95a5a6"/><circle cx="50" cy="50" r="5" fill="#fff"/>' },
+        brute: { id: 'brute', name: 'Brute', rarity: 'Common', cost: 35, dmg: 35, range: 90, cd: 40, projSpeed: 10, color: '#7f8c8d', svg: '<rect x="30" y="30" width="40" height="40" fill="#7f8c8d"/>' },
         archer: { id: 'archer', name: 'Archer', rarity: 'Common', cost: 40, dmg: 15, range: 180, cd: 20, projSpeed: 12, color: '#2ecc71', svg: '<polygon points="50,20 65,80 35,80" fill="#2ecc71"/>' },
         squire: { id: 'squire', name: 'Squire', rarity: 'Common', cost: 50, dmg: 25, range: 100, cd: 30, projSpeed: 15, color: '#bdc3c7', svg: '<rect x="30" y="30" width="40" height="40" fill="#bdc3c7"/><line x1="50" y1="70" x2="50" y2="10" stroke="#7f8c8d" stroke-width="6"/>' },
         trapper: { id: 'trapper', name: 'Trapper', rarity: 'Common', cost: 45, dmg: 12, range: 150, cd: 15, projSpeed: 10, color: '#e67e22', svg: '<circle cx="50" cy="50" r="25" fill="#e67e22" stroke="#d35400" stroke-width="4"/>' },
+        rogue: { id: 'rogue', name: 'Rogue', rarity: 'Common', cost: 40, dmg: 18, range: 85, cd: 10, projSpeed: 20, color: '#34495e', svg: '<polygon points="40,20 60,20 50,80" fill="#34495e"/>' },
         
         // RARES
         knight: { id: 'knight', name: 'Knight', rarity: 'Rare', cost: 80, dmg: 45, range: 110, cd: 35, projSpeed: 15, color: '#3498db', svg: '<rect x="25" y="25" width="50" height="50" fill="#3498db"/><line x1="50" y1="75" x2="50" y2="5" stroke="#ecf0f1" stroke-width="8"/>' },
@@ -192,6 +203,8 @@
         mage: { id: 'mage', name: 'Mage', rarity: 'Rare', cost: 120, dmg: 55, range: 200, cd: 45, projSpeed: 7, color: '#9b59b6', svg: '<polygon points="50,20 80,80 20,80" fill="#9b59b6"/><circle cx="50" cy="20" r="10" fill="#8e44ad"/>' },
         gunner: { id: 'gunner', name: 'Gunner', rarity: 'Rare', cost: 110, dmg: 20, range: 140, cd: 8, projSpeed: 25, color: '#f39c12', svg: '<rect x="40" y="20" width="20" height="60" fill="#f39c12"/><circle cx="50" cy="20" r="8" fill="#fff"/>' },
         berserker: { id: 'berserker', name: 'Berserker', rarity: 'Rare', cost: 130, dmg: 75, range: 90, cd: 20, projSpeed: 20, color: '#c0392b', svg: '<polygon points="10,10 90,10 50,90" fill="#c0392b"/>' },
+        cyborg: { id: 'cyborg', name: 'Cyborg', rarity: 'Rare', cost: 115, dmg: 45, range: 180, cd: 15, projSpeed: 40, color: '#00cec9', svg: '<circle cx="50" cy="50" r="20" fill="#00cec9"/><rect x="50" y="45" width="30" height="10" fill="#fff"/>' },
+        witch: { id: 'witch', name: 'Witch', rarity: 'Rare', cost: 125, dmg: 50, range: 190, cd: 35, projSpeed: 12, color: '#8e44ad', svg: '<polygon points="50,10 70,50 30,50" fill="#8e44ad"/><rect x="40" y="50" width="20" height="30" fill="#2c3e50"/>' },
 
         // EPICS
         paladin: { id: 'paladin', name: 'Paladin', rarity: 'Epic', cost: 180, dmg: 90, range: 130, cd: 40, projSpeed: 15, color: '#f1c40f', svg: '<rect x="20" y="20" width="60" height="60" fill="#f1c40f"/><line x1="50" y1="80" x2="50" y2="0" stroke="#fff" stroke-width="10"/><line x1="20" y1="30" x2="80" y2="30" stroke="#fff" stroke-width="10"/>' },
@@ -202,6 +215,8 @@
         engineer: { id: 'engineer', name: 'Engineer', rarity: 'Epic', cost: 230, dmg: 60, range: 160, cd: 5, projSpeed: 30, color: '#7f8c8d', svg: '<rect x="25" y="25" width="50" height="50" fill="#7f8c8d"/><circle cx="50" cy="50" r="10" fill="#f1c40f"/>' },
         bloodmage: { id: 'bloodmage', name: 'Blood Mage', rarity: 'Epic', cost: 240, dmg: 200, range: 150, cd: 45, projSpeed: 18, color: '#8b0000', svg: '<polygon points="50,90 20,40 80,40" fill="#8b0000"/><circle cx="50" cy="30" r="15" fill="#e74c3c"/>' },
         beastmaster: { id: 'beastmaster', name: 'Beastmaster', rarity: 'Epic', cost: 200, dmg: 80, range: 190, cd: 20, projSpeed: 14, color: '#d35400', svg: '<circle cx="50" cy="50" r="30" fill="#d35400"/><circle cx="40" cy="40" r="5" fill="#fff"/><circle cx="60" cy="40" r="5" fill="#fff"/>' },
+        shaman: { id: 'shaman', name: 'Shaman', rarity: 'Epic', cost: 195, dmg: 100, range: 200, cd: 45, projSpeed: 15, color: '#27ae60', svg: '<polygon points="50,20 70,80 30,80" fill="#27ae60"/><circle cx="50" cy="50" r="10" fill="#f1c40f"/>' },
+        gargoyle: { id: 'gargoyle', name: 'Gargoyle', rarity: 'Epic', cost: 220, dmg: 250, range: 140, cd: 65, projSpeed: 8, color: '#7f8c8d', svg: '<polygon points="20,80 80,80 50,20" fill="#7f8c8d"/><rect x="40" y="80" width="20" height="10" fill="#2c3e50"/>' },
 
         // LEGENDARIES
         necro: { id: 'necro', name: 'Necromancer', rarity: 'Legendary', cost: 300, dmg: 200, range: 250, cd: 60, projSpeed: 6, color: '#1abc9c', svg: '<rect x="30" y="20" width="40" height="60" fill="#2c3e50"/><circle cx="50" cy="35" r="12" fill="#1abc9c"/><line x1="50" y1="50" x2="50" y2="70" stroke="#1abc9c" stroke-width="4"/>' },
@@ -212,45 +227,95 @@
         storm: { id: 'storm', name: 'Storm', rarity: 'Legendary', cost: 700, dmg: 650, range: 320, cd: 80, projSpeed: 50, color: '#48dbfb', svg: '<polygon points="60,10 30,50 50,50 40,90 70,50 50,50" fill="#48dbfb"/>' },
         zeus: { id: 'zeus', name: 'Zeus', rarity: 'Legendary', cost: 800, dmg: 900, range: 450, cd: 70, projSpeed: 60, color: '#f9ca24', svg: '<polygon points="60,10 40,50 50,50 30,90 80,40 50,45" fill="#f9ca24"/>' },
         timeweaver: { id: 'timeweaver', name: 'Time Weaver', rarity: 'Legendary', cost: 750, dmg: 100, range: 500, cd: 4, projSpeed: 45, color: '#00cec9', svg: '<circle cx="50" cy="50" r="30" fill="none" stroke="#00cec9" stroke-width="8"/><line x1="50" y1="50" x2="50" y2="30" stroke="#00cec9" stroke-width="4"/><line x1="50" y1="50" x2="70" y2="50" stroke="#00cec9" stroke-width="4"/>' },
+        poseidon: { id: 'poseidon', name: 'Poseidon', rarity: 'Legendary', cost: 550, dmg: 350, range: 300, cd: 45, projSpeed: 25, color: '#0984e3', svg: '<polygon points="50,10 70,30 60,30 60,90 40,90 40,30 30,30" fill="#0984e3"/>' },
+        phoenix: { id: 'phoenix', name: 'Phoenix', rarity: 'Legendary', cost: 720, dmg: 550, range: 350, cd: 35, projSpeed: 20, color: '#e67e22', svg: '<path d="M50,20 Q80,50 50,80 Q20,50 50,20" fill="#e67e22"/><circle cx="50" cy="40" r="10" fill="#f1c40f"/>' },
         
         // MYTHIC
         jester: { id: 'jester', name: 'The Jester', rarity: 'Mythic', cost: 999, dmg: 2500, range: 500, cd: 20, projSpeed: 80, color: '#ff4757', svg: '<circle cx="50" cy="50" r="40" fill="#ff4757"/><polygon points="10,50 50,10 90,50 50,90" fill="#2f3542"/><circle cx="30" cy="40" r="5" fill="#fff"/><circle cx="70" cy="40" r="5" fill="#fff"/><path d="M30,70 Q50,90 70,70" stroke="#fff" stroke-width="5" fill="none"/>' },
-        sungod: { id: 'sungod', name: 'Sun God', rarity: 'Mythic', cost: 1200, dmg: 5000, range: 600, cd: 30, projSpeed: 100, color: '#f39c12', svg: '<circle cx="50" cy="50" r="20" fill="#f39c12"/><path d="M50,10 L50,30 M50,90 L50,70 M10,50 L30,50 M90,50 L70,50 M20,20 L35,35 M80,80 L65,65 M20,80 L35,65 M80,20 L65,35" stroke="#f1c40f" stroke-width="6"/>' }
+        sungod: { id: 'sungod', name: 'Sun God', rarity: 'Mythic', cost: 1200, dmg: 5000, range: 600, cd: 30, projSpeed: 100, color: '#f39c12', svg: '<circle cx="50" cy="50" r="20" fill="#f39c12"/><path d="M50,10 L50,30 M50,90 L50,70 M10,50 L30,50 M90,50 L70,50 M20,20 L35,35 M80,80 L65,65 M20,80 L35,65 M80,20 L65,35" stroke="#f1c40f" stroke-width="6"/>' },
+        reaper: { id: 'reaper', name: 'Grim Reaper', rarity: 'Mythic', cost: 1500, dmg: 6666, range: 250, cd: 50, projSpeed: 50, color: '#2d3436', svg: '<path d="M40,20 Q60,10 80,30 Q70,40 50,30 L50,90 L40,90 Z" fill="#2d3436"/><circle cx="50" cy="50" r="8" fill="#e74c3c"/>' },
+        cthulhu: { id: 'cthulhu', name: 'Cthulhu', rarity: 'Mythic', cost: 1800, dmg: 9999, range: 700, cd: 100, projSpeed: 15, color: '#10ac84', svg: '<circle cx="50" cy="40" r="25" fill="#10ac84"/><path d="M40,60 Q30,90 20,80 M50,65 Q50,100 50,90 M60,60 Q70,90 80,80" stroke="#10ac84" stroke-width="8" fill="none"/>' }
     };
 
-    // --- SAVE DATA MANAGEMENT ---
-    let player = JSON.parse(localStorage.getItem('dotr_save')) || { shards: 100, unlocked: ['militia'], equipped: ['militia'] };
-    player.unlocked = player.unlocked.filter(id => HERO_DB[id]);
-    player.equipped = player.equipped.filter(id => HERO_DB[id]);
-    
+    // --- SECURE SAVE DATA LOGIC ---
+    const SECRET_SALT = "ULTIMATE_CHAOS_KEY";
+    let player;
+
+    function loadGame() {
+        try {
+            const savedData = localStorage.getItem('dotr_save_encrypted');
+            if (savedData) {
+                let decodedStr = decodeURIComponent(atob(savedData));
+                if (decodedStr.endsWith(SECRET_SALT)) {
+                    let jsonStr = decodedStr.slice(0, -SECRET_SALT.length);
+                    player = JSON.parse(jsonStr);
+                } else {
+                    throw new Error("Tampered Save");
+                }
+            } else {
+                throw new Error("No Save");
+            }
+        } catch (e) {
+            // If tampered or no save, start fresh
+            player = { shards: 100, unlocked: ['militia'], equipped: ['militia'], hasSeenMergeTutorial: false };
+        }
+
+        // Clean ghost heroes
+        if(player.hasSeenMergeTutorial === undefined) player.hasSeenMergeTutorial = false;
+        player.unlocked = player.unlocked.filter(id => HERO_DB[id]);
+        player.equipped = player.equipped.filter(id => HERO_DB[id]);
+    }
+
     function saveGame() {
-        localStorage.setItem('dotr_save', JSON.stringify(player));
+        try {
+            let jsonStr = JSON.stringify(player);
+            let encodedStr = btoa(encodeURIComponent(jsonStr + SECRET_SALT));
+            localStorage.setItem('dotr_save_encrypted', encodedStr);
+        } catch (e) { console.error("Save failed"); }
         updateShardsUI();
     }
 
-    function resetSaveData() {
+    loadGame(); // Boot load
+
+    window.resetSaveData = function() {
         if(confirm("Are you sure you want to delete all progress? This wipes your heroes and shards!")) {
-            localStorage.removeItem('dotr_save');
+            localStorage.removeItem('dotr_save_encrypted');
             location.reload();
         }
-    }
+    };
 
+    // --- GAME ENGINE VARIABLES ---
     let invSelection = null; 
     let difficulty = 'easy';
     let waveSpawnsCompleted = true; 
     let waveSpawnsTotal = 0;
     let waveSpawnsCount = 0;
-
-    const updateShardsUI = () => document.getElementById('shard-count').innerText = player.shards;
+    let gameEnv = { gold: 100, lives: 10, wave: 0, active: false, isPaused: false, isEndless: false };
     
-    function showScreen(screenId) {
+    let nodeRatios = [
+        { rx: 0.2, ry: 0.2 }, { rx: 0.3, ry: 0.45 }, { rx: 0.55, ry: 0.7 },
+        { rx: 0.7, ry: 0.5 }, { rx: 0.85, ry: 0.35 }, { rx: 0.5, ry: 0.2 },
+        { rx: 0.3, ry: 0.8 }, { rx: 0.7, ry: 0.8 }, { rx: 0.15, ry: 0.6 }, { rx: 0.8, ry: 0.1 }
+    ];
+    let nodes = [], deployedHeroes = [], enemies = [], projectiles = [], particles = [];
+    let path = [];
+    let loopId, spawnInterval;
+    let selectedHeroToPlace = null;
+    let selectedNodeForUpg = null;
+
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // --- EXPORTED UI FUNCTIONS ---
+    window.showScreen = function(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
         document.getElementById(screenId).classList.add('active-screen');
         document.getElementById('ui-shards').style.display = (screenId === 'screen-game') ? 'none' : 'block';
-    }
+    };
 
-    // --- EPIC SUMMONING LOGIC WITH GACHA ODDS & DUPLICATES ---
-    function performSummon() {
+    const updateShardsUI = () => document.getElementById('shard-count').innerText = player.shards;
+    
+    window.performSummon = function() {
         if (player.shards < 100) return alert("Not enough shards! Defeat waves to earn more.");
         
         player.shards -= 100;
@@ -262,7 +327,7 @@
         const animContainer = document.getElementById('summon-anim-container');
         animContainer.style.display = 'flex';
         
-        // Exact User Odds (60, 50, 20, 10, 1)
+        // Updated Odds (60, 50, 20, 10, 1)
         let pool = [];
         Object.values(HERO_DB).forEach(h => {
             let weight = 0;
@@ -287,7 +352,7 @@
             }, 400); 
             
         }, 2000); 
-    }
+    };
 
     function executePull(id) {
         const hero = HERO_DB[id];
@@ -321,7 +386,7 @@
         return '#fff';
     }
 
-    function openInventory() { showScreen('screen-inventory'); renderInventory(); }
+    window.openInventory = function() { showScreen('screen-inventory'); renderInventory(); };
     
     function renderInventory() {
         const grid = document.getElementById('inv-grid'); grid.innerHTML = '';
@@ -335,7 +400,7 @@
         });
     }
 
-    function openIndex() {
+    window.openIndex = function() {
         showScreen('screen-index');
         const grid = document.getElementById('index-grid'); grid.innerHTML = '';
         const allHeroes = Object.values(HERO_DB).sort((a,b) => a.cost - b.cost);
@@ -352,52 +417,35 @@
             `;
             grid.appendChild(div);
         });
-    }
+    };
 
-    function equipSelected() {
+    window.equipSelected = function() {
         if (!invSelection || player.equipped.includes(invSelection)) return;
         if (player.equipped.length >= 5) return alert("Max 5 heroes equipped!");
         player.equipped.push(invSelection);
         saveGame(); renderInventory();
-    }
+    };
     
-    function unequipSelected() {
+    window.unequipSelected = function() {
         if (!invSelection) return;
         player.equipped = player.equipped.filter(id => id !== invSelection);
         saveGame(); renderInventory();
-    }
+    };
 
-    function setDifficulty(diff) {
+    window.setDifficulty = function(diff) {
         difficulty = diff;
         document.querySelectorAll('.diff-btn').forEach(b => b.style.boxShadow = 'none');
         document.getElementById(`btn-${diff}`).style.boxShadow = `0 0 20px ${document.getElementById(`btn-${diff}`).style.borderColor}`;
-    }
+    };
 
-    // ==========================================
-    // --- FULLSCREEN GAME ENGINE ---
-    // ==========================================
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-
-    let gameEnv = { gold: 100, lives: 10, wave: 0, active: false, isPaused: false, isEndless: false };
-    let nodeRatios = [
-        { rx: 0.2, ry: 0.2 }, { rx: 0.3, ry: 0.45 }, { rx: 0.55, ry: 0.7 },
-        { rx: 0.7, ry: 0.5 }, { rx: 0.85, ry: 0.35 }, { rx: 0.5, ry: 0.2 },
-        { rx: 0.3, ry: 0.8 }, { rx: 0.7, ry: 0.8 }, { rx: 0.15, ry: 0.6 }, { rx: 0.8, ry: 0.1 }
-    ];
-    let nodes = [], deployedHeroes = [], enemies = [], projectiles = [], particles = [];
-    let path = [];
-    let loopId, spawnInterval;
-    let selectedHeroToPlace = null;
-    let selectedNodeForUpg = null;
-
+    // --- GAME ENGINE SCRIPT ---
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         recalculateMap();
     }
     window.addEventListener('resize', resizeCanvas);
-    window.addEventListener('keydown', e => { if(e.key === 'Escape' && gameEnv.active) togglePause(); });
+    window.addEventListener('keydown', e => { if(e.key === 'Escape' && gameEnv.active) window.togglePause(); });
 
     function recalculateMap() {
         const w = canvas.width; const h = canvas.height;
@@ -405,14 +453,10 @@
             {x: 0, y: h*0.3}, {x: w*0.4, y: h*0.3}, {x: w*0.4, y: h*0.7}, 
             {x: w*0.8, y: h*0.7}, {x: w*0.8, y: h*0.2}, {x: w, y: h*0.2}
         ];
-        
         if (nodes.length === 0) {
             nodes = nodeRatios.map(r => ({ x: w * r.rx, y: h * r.ry, radius: 40, occupied: null }));
         } else {
-            nodes.forEach((n, i) => {
-                n.x = w * nodeRatios[i].rx;
-                n.y = h * nodeRatios[i].ry;
-            });
+            nodes.forEach((n, i) => { n.x = w * nodeRatios[i].rx; n.y = h * nodeRatios[i].ry; });
         }
     }
 
@@ -426,7 +470,7 @@
         }
     }
 
-    function startGame() {
+    window.startGame = function() {
         if (player.equipped.length === 0) return alert("Equip a hero first!");
         showScreen('screen-game');
         
@@ -438,15 +482,11 @@
         if(difficulty === 'extreme') { startGold = 100; startLives = 1; }
         if(difficulty === 'impossible') { startGold = 50; startLives = 1; }
 
-        gameEnv = { 
-            gold: startGold, 
-            lives: startLives, 
-            wave: 0, active: true, isPaused: false, isEndless: false 
-        };
+        gameEnv = { gold: startGold, lives: startLives, wave: 0, active: true, isPaused: false, isEndless: false };
         deployedHeroes = []; enemies = []; projectiles = []; particles = [];
         selectedHeroToPlace = null; selectedNodeForUpg = null;
         waveSpawnsCompleted = true; 
-        closeUpgradeMenu();
+        window.closeUpgradeMenu();
         
         buildPlacementBar();
         updateGameUI();
@@ -454,7 +494,7 @@
         if(loopId) cancelAnimationFrame(loopId);
         if(spawnInterval) clearInterval(spawnInterval);
         gameLoop();
-    }
+    };
 
     function buildPlacementBar() {
         const bar = document.getElementById('placement-bar'); bar.innerHTML = '';
@@ -464,7 +504,7 @@
             slot.className = `roster-slot rarity-${h.rarity}`;
             slot.innerHTML = `<svg width="40" height="40" viewBox="0 0 100 100">${h.svg}</svg><span class="roster-cost">${h.cost}g</span>`;
             slot.onclick = () => {
-                closeUpgradeMenu();
+                window.closeUpgradeMenu();
                 if(selectedHeroToPlace === h) { 
                     selectedHeroToPlace = null;
                     slot.classList.remove('active');
@@ -484,6 +524,27 @@
         document.getElementById('game-wave').innerText = gameEnv.wave;
     }
 
+    function checkMergeTutorial() {
+        if (player.hasSeenMergeTutorial) return;
+        let counts = {};
+        deployedHeroes.forEach(dh => {
+            if(!dh.node.occupied.isMerged) counts[dh.node.occupied.data.id] = (counts[dh.node.occupied.data.id] || 0) + 1;
+        });
+        
+        for(let id in counts) {
+            if(counts[id] >= 3) {
+                player.hasSeenMergeTutorial = true;
+                saveGame();
+                const box = document.getElementById('tutorial-box');
+                box.style.display = 'block';
+                box.style.borderColor = '#9b59b6';
+                box.innerHTML = "<h3 style='color:#9b59b6; margin:0 0 10px 0;'>MERGE UNLOCKED!</h3>You have 3 of the same Hero!<br>Click one of them and press <b>MERGE</b> to combine them into an APEX hero with insane stats!";
+                setTimeout(() => { box.style.display = 'none'; box.style.borderColor = '#66fcf1'; }, 8000);
+                break;
+            }
+        }
+    }
+
     canvas.addEventListener('mousedown', (e) => {
         if (!gameEnv.active || gameEnv.isPaused) return;
         const mx = e.clientX; const my = e.clientY;
@@ -497,24 +558,23 @@
                     gameEnv.gold -= selectedHeroToPlace.cost;
                     clickedNode.occupied = { 
                         data: selectedHeroToPlace, level: 1, invested: selectedHeroToPlace.cost, 
-                        cd: 0, currentDmg: selectedHeroToPlace.dmg, currentRange: selectedHeroToPlace.range
+                        cd: 0, maxCd: selectedHeroToPlace.cd, currentDmg: selectedHeroToPlace.dmg, currentRange: selectedHeroToPlace.range, isMerged: false
                     };
                     deployedHeroes.push({ node: clickedNode });
-                    
                     selectedHeroToPlace = null;
                     document.querySelectorAll('.roster-slot').forEach(el => el.classList.remove('active'));
                     updateGameUI();
+                    checkMergeTutorial();
                 }
             } else if (clickedNode.occupied && !selectedHeroToPlace) {
                 selectedNodeForUpg = clickedNode;
                 openUpgradeMenu();
             }
         } else {
-            closeUpgradeMenu();
+            window.closeUpgradeMenu();
         }
     });
 
-    // --- UPGRADE SYSTEM ---
     function calcUpgradeCost(hero) { return Math.floor(hero.data.cost * Math.pow(1.8, hero.level)); }
 
     function openUpgradeMenu() {
@@ -527,63 +587,97 @@
         if(!selectedNodeForUpg) return;
         const hero = selectedNodeForUpg.occupied;
         
-        document.getElementById('upg-title').innerText = hero.data.name;
+        document.getElementById('upg-title').innerText = hero.data.name + (hero.isMerged ? " (APEX)" : "");
+        document.getElementById('upg-title').style.color = hero.isMerged ? "#9b59b6" : "#66fcf1";
         document.getElementById('upg-lvl').innerText = hero.level;
         document.getElementById('upg-dmg').innerText = hero.currentDmg;
         document.getElementById('upg-rng').innerText = hero.currentRange;
         
         let upgCost = calcUpgradeCost(hero);
         let sellVal = Math.floor(hero.invested * 0.6); 
-        
         document.getElementById('sell-val').innerText = sellVal;
         
         const btnUpg = document.getElementById('btn-upgrade');
         if(hero.level >= 5) {
             btnUpg.innerText = "MAX LEVEL"; btnUpg.disabled = true;
         } else {
-            btnUpg.innerText = `Upgrade (${upgCost}g)`; 
-            btnUpg.disabled = gameEnv.gold < upgCost;
+            btnUpg.innerText = `Upgrade (${upgCost}g)`; btnUpg.disabled = gameEnv.gold < upgCost;
+        }
+        
+        const btnMerge = document.getElementById('btn-merge');
+        if (hero.isMerged) {
+            btnMerge.style.display = 'block';
+            btnMerge.innerText = "⭐ APEX MERGED ⭐"; btnMerge.disabled = true;
+            btnMerge.style.borderColor = "#9b59b6"; btnMerge.style.color = "#9b59b6";
+        } else {
+            let count = deployedHeroes.filter(dh => dh.node.occupied && !dh.node.occupied.isMerged && dh.node.occupied.data.id === hero.data.id).length;
+            btnMerge.style.display = 'block';
+            if (count >= 3) {
+                btnMerge.innerText = "MERGE (Consume 2)"; btnMerge.disabled = false;
+                btnMerge.style.borderColor = "#f1c40f"; btnMerge.style.color = "#f1c40f";
+            } else {
+                btnMerge.innerText = `Merge (${count}/3)`; btnMerge.disabled = true;
+                btnMerge.style.borderColor = "#555"; btnMerge.style.color = "#555";
+            }
         }
     }
 
-    function closeUpgradeMenu() {
+    window.mergeTower = function() {
+        if(!selectedNodeForUpg) return;
+        const hero = selectedNodeForUpg.occupied;
+        if(hero.isMerged) return;
+        
+        let others = deployedHeroes.filter(dh => dh.node !== selectedNodeForUpg && dh.node.occupied && !dh.node.occupied.isMerged && dh.node.occupied.data.id === hero.data.id);
+        
+        if (others.length >= 2) {
+            let consumed1 = others[0]; let consumed2 = others[1];
+            hero.invested += consumed1.node.occupied.invested + consumed2.node.occupied.invested;
+            
+            consumed1.node.occupied = null; consumed2.node.occupied = null;
+            deployedHeroes = deployedHeroes.filter(dh => dh.node !== consumed1.node && dh.node !== consumed2.node);
+            
+            hero.isMerged = true;
+            hero.currentDmg *= 3;
+            hero.currentRange = Math.floor(hero.currentRange * 1.3);
+            hero.maxCd = Math.max(2, Math.floor(hero.maxCd / 2)); 
+            
+            spawnParticles(selectedNodeForUpg.x, selectedNodeForUpg.y, '#9b59b6', 50);
+            updateGameUI(); refreshUpgradeUI(); 
+        }
+    };
+
+    window.closeUpgradeMenu = function() {
         document.getElementById('upgrade-menu').classList.remove('open');
         selectedNodeForUpg = null;
-    }
+    };
 
-    function buyUpgrade() {
+    window.buyUpgrade = function() {
         if(!selectedNodeForUpg) return;
         const hero = selectedNodeForUpg.occupied;
         let upgCost = calcUpgradeCost(hero);
         
         if (gameEnv.gold >= upgCost && hero.level < 5) {
-            gameEnv.gold -= upgCost;
-            hero.invested += upgCost;
-            hero.level++;
+            gameEnv.gold -= upgCost; hero.invested += upgCost; hero.level++;
             hero.currentDmg = Math.floor(hero.currentDmg * 1.5);
             hero.currentRange = Math.floor(hero.currentRange * 1.15);
             updateGameUI(); refreshUpgradeUI(); 
         }
-    }
+    };
 
-    function sellTower() {
+    window.sellTower = function() {
         if(!selectedNodeForUpg) return;
         const hero = selectedNodeForUpg.occupied;
-        let sellVal = Math.floor(hero.invested * 0.6);
-        gameEnv.gold += sellVal;
-        
+        gameEnv.gold += Math.floor(hero.invested * 0.6);
         deployedHeroes = deployedHeroes.filter(dh => dh.node !== selectedNodeForUpg);
         selectedNodeForUpg.occupied = null;
-        
-        updateGameUI(); closeUpgradeMenu();
-    }
+        updateGameUI(); window.closeUpgradeMenu();
+    };
 
-    function startWave() {
+    window.startWave = function() {
         if (!waveSpawnsCompleted || enemies.length > 0) return; 
 
         gameEnv.wave++; updateGameUI();
-        waveSpawnsCompleted = false;
-        waveSpawnsCount = 0;
+        waveSpawnsCompleted = false; waveSpawnsCount = 0;
         
         let baseCount = 10 + (gameEnv.wave * 5);
         let diffMult = 1; let healthMult = 1; let speedMult = 1;
@@ -593,14 +687,12 @@
         if (difficulty === 'impossible') { diffMult = 10; healthMult = 4; speedMult = 1.5; }
         
         waveSpawnsTotal = Math.floor(baseCount * diffMult);
-        
         let sTime = Math.max(30, 800 - (gameEnv.wave*20) - (diffMult * 60)); 
         
         spawnInterval = setInterval(() => {
             if (waveSpawnsCount >= waveSpawnsTotal || !gameEnv.active || gameEnv.isPaused) {
                 if(waveSpawnsCount >= waveSpawnsTotal) {
-                    clearInterval(spawnInterval);
-                    waveSpawnsCompleted = true; 
+                    clearInterval(spawnInterval); waveSpawnsCompleted = true; 
                 }
                 return; 
             }
@@ -610,40 +702,31 @@
             let spd = (1.5 + (gameEnv.wave*0.1)) * speedMult;
             let hp = (30 + gameEnv.wave * 35) * healthMult;
 
-            if (gameEnv.wave >= 20 && waveSpawnsCount % 25 === 0) {
-                eType = "Titan"; color = "#000"; spd *= 0.2; hp *= 50; sz = 55;
-            } else if (gameEnv.wave >= 15 && waveSpawnsCount % 20 === 0) {
-                eType = "Boss"; color = "#8e44ad"; spd *= 0.5; hp *= 10; sz = 35;
-            } else if (gameEnv.wave >= 20 && rand > 0.95) {
-                eType = "Juggernaut"; color = "#2c3e50"; spd *= 0.3; hp *= 25; sz = 45;
-            } else if (gameEnv.wave >= 16 && rand > 0.85) {
-                eType = "Assassin"; color = "#8e44ad"; spd *= 2.5; hp *= 0.6; sz = 12;
-            } else if (gameEnv.wave >= 12 && rand > 0.75) {
-                eType = "Ghost"; color = "rgba(236, 240, 241, 0.6)"; spd *= 1.4; hp *= 0.8; sz = 16;
-            } else if (gameEnv.wave >= 8 && rand > 0.6) {
-                eType = "Tank"; color = "#7f8c8d"; spd *= 0.6; hp *= 3.5; sz = 22;
-            } else if (gameEnv.wave >= 4 && rand > 0.4) {
-                eType = "Swarmer"; color = "#e67e22"; spd *= 2.2; hp *= 0.2; sz = 8;
-            } else if (rand > 0.2) {
-                eType = "Sprinter"; color = "#f1c40f"; spd *= 1.8; hp *= 0.5; sz = 11;
-            }
+            if (gameEnv.wave >= 20 && waveSpawnsCount % 25 === 0) { eType = "Titan"; color = "#000"; spd *= 0.2; hp *= 50; sz = 55; }
+            else if (gameEnv.wave >= 18 && rand > 0.9) { eType = "Colossus"; color = "#34495e"; spd *= 0.4; hp *= 15; sz = 30; }
+            else if (gameEnv.wave >= 15 && waveSpawnsCount % 20 === 0) { eType = "Boss"; color = "#8e44ad"; spd *= 0.5; hp *= 10; sz = 35; }
+            else if (gameEnv.wave >= 20 && rand > 0.95) { eType = "Juggernaut"; color = "#2c3e50"; spd *= 0.3; hp *= 25; sz = 45; }
+            else if (gameEnv.wave >= 16 && rand > 0.85) { eType = "Assassin"; color = "#8e44ad"; spd *= 2.5; hp *= 0.6; sz = 12; }
+            else if (gameEnv.wave >= 14 && rand > 0.8) { eType = "Wraith"; color = "rgba(189, 195, 199, 0.5)"; spd *= 1.6; hp *= 0.7; sz = 15; }
+            else if (gameEnv.wave >= 12 && rand > 0.75) { eType = "Ghost"; color = "rgba(236, 240, 241, 0.6)"; spd *= 1.4; hp *= 0.8; sz = 16; }
+            else if (gameEnv.wave >= 8 && rand > 0.6) { eType = "Tank"; color = "#7f8c8d"; spd *= 0.6; hp *= 3.5; sz = 22; }
+            else if (gameEnv.wave >= 4 && rand > 0.4) { eType = "Swarmer"; color = "#e67e22"; spd *= 2.2; hp *= 0.2; sz = 8; }
+            else if (rand > 0.2) { eType = "Sprinter"; color = "#f1c40f"; spd *= 1.8; hp *= 0.5; sz = 11; }
 
             enemies.push({ 
-                x: path[0].x + (Math.random()*10 - 5), 
-                y: path[0].y + (Math.random()*10 - 5), 
-                targetIdx: 1, type: eType,
-                speed: spd, hp: hp, maxHp: hp, size: sz, color: color, isDead: false
+                x: path[0].x + (Math.random()*10 - 5), y: path[0].y + (Math.random()*10 - 5), 
+                targetIdx: 1, type: eType, speed: spd, hp: hp, maxHp: hp, size: sz, color: color, isDead: false
             });
             waveSpawnsCount++;
         }, sTime); 
-    }
+    };
 
-    function togglePause() {
+    window.togglePause = function() {
         gameEnv.isPaused = !gameEnv.isPaused;
         document.getElementById('pause-overlay').style.display = gameEnv.isPaused ? 'flex' : 'none';
-    }
+    };
 
-    function exitToMenu() {
+    window.exitToMenu = function() {
         gameEnv.active = false;
         document.getElementById('pause-overlay').style.display = 'none';
         document.getElementById('endless-overlay').style.display = 'none';
@@ -651,7 +734,7 @@
         if(loopId) cancelAnimationFrame(loopId);
         showScreen('screen-menu');
         saveGame();
-    }
+    };
 
     function triggerVictory() {
         gameEnv.isPaused = true;
@@ -659,16 +742,15 @@
         if(difficulty === 'hard') reward = 75;
         if(difficulty === 'extreme') reward = 100;
         if(difficulty === 'impossible') reward = 150;
-        player.shards += reward; 
-        saveGame();
+        player.shards += reward; saveGame();
         document.getElementById('endless-overlay').style.display = 'flex';
     }
 
-    function continueEndless() {
+    window.continueEndless = function() {
         gameEnv.isEndless = true;
         gameEnv.isPaused = false;
         document.getElementById('endless-overlay').style.display = 'none';
-    }
+    };
 
     function gameLoop() {
         if (!gameEnv.active) return;
@@ -691,7 +773,7 @@
                 if (e.targetIdx >= path.length) {
                     gameEnv.lives--; updateGameUI();
                     e.isDead = true;
-                    if (gameEnv.lives <= 0) { alert("Base Destroyed!"); exitToMenu(); return; }
+                    if (gameEnv.lives <= 0) { alert("Base Destroyed!"); window.exitToMenu(); return; }
                 }
             } else {
                 e.x += (t.x - e.x) / dist * e.speed; e.y += (t.y - e.y) / dist * e.speed;
@@ -702,11 +784,10 @@
             let hero = dh.node.occupied;
             if (hero.cd > 0) hero.cd--;
             else {
-                let target = null; 
-                let maxProgress = -1; 
+                let target = null; let maxProgress = -1; 
                 enemies.forEach(e => {
                     let d = Math.hypot(e.x - dh.node.x, e.y - dh.node.y);
-                    let effectiveRange = e.type === 'Ghost' ? hero.currentRange * 0.5 : hero.currentRange;
+                    let effectiveRange = (e.type === 'Ghost' || e.type === 'Wraith') ? hero.currentRange * 0.5 : hero.currentRange;
 
                     if (d <= effectiveRange && !e.isDead) { 
                         let distToNode = Math.hypot(path[e.targetIdx].x - e.x, path[e.targetIdx].y - e.y);
@@ -716,9 +797,9 @@
                 });
                 
                 if (target) {
-                    hero.cd = hero.data.cd;
-                    spawnParticles(dh.node.x, dh.node.y, '#f1c40f', 3);
-                    projectiles.push({ x: dh.node.x, y: dh.node.y, target: target, dmg: hero.currentDmg, speed: hero.data.projSpeed, color: hero.data.color, lastX: target.x, lastY: target.y });
+                    hero.cd = hero.maxCd;
+                    spawnParticles(dh.node.x, dh.node.y, hero.isMerged ? '#9b59b6' : '#f1c40f', 3);
+                    projectiles.push({ x: dh.node.x, y: dh.node.y, target: target, dmg: hero.currentDmg, speed: hero.data.projSpeed, color: hero.isMerged ? '#9b59b6' : hero.data.color, lastX: target.x, lastY: target.y });
                 }
             }
         });
@@ -744,7 +825,7 @@
                         if (p.target.type === 'Titan') shardDrop = 5;
                         else if (p.target.type === 'Boss') shardDrop = 3;
                         else if (p.target.type === 'Juggernaut') shardDrop = 2;
-                        else if (Math.random() < 0.05) shardDrop = 1; 
+                        else if (Math.random() < 0.20) shardDrop = 1; 
 
                         if(difficulty === 'hard') shardDrop = Math.ceil(shardDrop * 1.5); 
                         if(difficulty === 'extreme') shardDrop *= 2; 
@@ -804,6 +885,12 @@
 
             if (n.occupied) {
                 drawHeroGraphic(n.occupied.data, n.x, n.y);
+                
+                if (n.occupied.isMerged) {
+                    ctx.strokeStyle = "#9b59b6"; ctx.lineWidth = 6;
+                    ctx.beginPath(); ctx.arc(n.x, n.y, 28, 0, Math.PI*2); ctx.stroke();
+                }
+
                 ctx.fillStyle = "#f1c40f";
                 for(let l=0; l<n.occupied.level; l++) { ctx.fillRect(n.x - 15 + (l*8), n.y + 25, 6, 6); }
 
@@ -848,6 +935,7 @@
     }
 
     updateShardsUI();
+})();
 </script>
 </body>
 </html>
