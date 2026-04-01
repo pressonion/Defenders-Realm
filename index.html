@@ -241,6 +241,15 @@
     const SECRET_SALT = "ULTIMATE_CHAOS_KEY";
     let player;
 
+    function saveGame() {
+        try {
+            let jsonStr = JSON.stringify(player);
+            let encodedStr = btoa(encodeURIComponent(jsonStr + SECRET_SALT));
+            localStorage.setItem('dotr_save_encrypted', encodedStr);
+        } catch (e) { console.error("Save failed"); }
+        updateShardsUI();
+    }
+
     function loadGame() {
         try {
             const savedData = localStorage.getItem('dotr_save_encrypted');
@@ -253,10 +262,19 @@
                     throw new Error("Tampered Save");
                 }
             } else {
-                throw new Error("No Save");
+                // 🚨 SAVE DATA RESCUE MISSION 🚨
+                const oldSave = localStorage.getItem('dotr_save');
+                if (oldSave) {
+                    player = JSON.parse(oldSave);
+                    alert("🎉 Old save data successfully rescued and secured!");
+                    // Immediately secure it in the new format so it's safe forever
+                    saveGame(); 
+                } else {
+                    throw new Error("No Save");
+                }
             }
         } catch (e) {
-            // If tampered or no save, start fresh
+            // If tampered or absolutely no save exists, start fresh
             player = { shards: 100, unlocked: ['militia'], equipped: ['militia'], hasSeenMergeTutorial: false };
         }
 
@@ -266,20 +284,12 @@
         player.equipped = player.equipped.filter(id => HERO_DB[id]);
     }
 
-    function saveGame() {
-        try {
-            let jsonStr = JSON.stringify(player);
-            let encodedStr = btoa(encodeURIComponent(jsonStr + SECRET_SALT));
-            localStorage.setItem('dotr_save_encrypted', encodedStr);
-        } catch (e) { console.error("Save failed"); }
-        updateShardsUI();
-    }
-
     loadGame(); // Boot load
 
     window.resetSaveData = function() {
         if(confirm("Are you sure you want to delete all progress? This wipes your heroes and shards!")) {
             localStorage.removeItem('dotr_save_encrypted');
+            localStorage.removeItem('dotr_save'); // Clear old ones too just in case
             location.reload();
         }
     };
@@ -327,7 +337,7 @@
         const animContainer = document.getElementById('summon-anim-container');
         animContainer.style.display = 'flex';
         
-        // Updated Odds (60, 50, 20, 10, 1)
+        // Exact User Odds (60, 50, 20, 10, 1)
         let pool = [];
         Object.values(HERO_DB).forEach(h => {
             let weight = 0;
@@ -934,8 +944,7 @@
         ctx.fillText(data.name.substring(0, 3).toUpperCase(), x, y);
     }
 
-    updateShardsUI();
-})();
+})(); // End of Anti-Cheat Vault
 </script>
 </body>
 </html>
