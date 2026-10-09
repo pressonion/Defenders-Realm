@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,69 +7,86 @@
     <title>Defenders of the Realm: Ultimate Chaos</title>
     <style>
         body { margin: 0; overflow: hidden; background-color: #0b0c10; color: white; font-family: 'Segoe UI', sans-serif; user-select: none; }
-        
         #game-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; }
         canvas { display: block; width: 100%; height: 100%; }
 
-        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at center, #1f2833 0%, #0b0c10 100%); z-index: 10; overflow-y: auto; overflow-x: hidden;}
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at center, #1f2833 0%, #0b0c10 100%); z-index: 10; overflow-y: auto; overflow-x: hidden; }
         .active-screen { display: flex; }
-        
-        h1 { color: #66fcf1; text-shadow: 0 0 10px #45a29e; font-size: 54px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; text-align: center;}
-        h2 { color: #c5c6c7; margin-bottom: 5px;}
-        
-        .btn { background: linear-gradient(135deg, #45a29e, #1f2833); color: white; border: 2px solid #66fcf1; padding: 12px 25px; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 6px; margin: 10px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); text-transform: uppercase;}
-        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(102, 252, 241, 0.4); }
+
+        h1 { color: #66fcf1; text-shadow: 0 0 10px #45a29e; font-size: 54px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; text-align: center; }
+        h2 { color: #c5c6c7; margin-bottom: 5px; }
+
+        .btn { background: linear-gradient(135deg, #45a29e, #1f2833); color: white; border: 2px solid #66fcf1; padding: 12px 25px; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 6px; margin: 10px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); text-transform: uppercase; }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(102,252,241,0.4); }
         .btn:disabled { filter: grayscale(100%); opacity: 0.5; cursor: not-allowed; }
 
-        .top-bar { position: absolute; top: 20px; right: 30px; font-size: 28px; font-weight: bold; color: #66fcf1; z-index: 20; text-shadow: 0 0 5px #45a29e;}
-        
-        .grid { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin: 20px; max-width: 900px;}
+        .top-bar { position: absolute; top: 20px; right: 30px; font-size: 28px; font-weight: bold; color: #66fcf1; z-index: 20; text-shadow: 0 0 5px #45a29e; }
+
+        .grid { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin: 20px; max-width: 900px; }
         .card { width: 110px; height: 160px; background: #1f2833; border: 3px solid #45a29e; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; position: relative; }
-        .card.selected { border-color: #f1c40f; box-shadow: 0 0 20px #f1c40f; transform: scale(1.05); z-index: 2;}
+        .card.selected { border-color: #f1c40f; box-shadow: 0 0 20px #f1c40f; transform: scale(1.05); z-index: 2; }
         .card.equipped::after { content: 'EQUIPPED'; position: absolute; top: -10px; background: #2ecc71; padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: bold; }
         .card.locked { filter: grayscale(100%) brightness(0.4); cursor: not-allowed; }
-        
-        /* Rarity Colors */
+
         .rarity-Common { border-color: #bdc3c7; }
         .rarity-Rare { border-color: #3498db; }
         .rarity-Epic { border-color: #9b59b6; }
-        .rarity-Legendary { border-color: #f1c40f; box-shadow: 0 0 10px rgba(241, 196, 15, 0.5); }
-        .rarity-Mythic { border-color: #ff4757; box-shadow: 0 0 20px rgba(255, 71, 87, 0.8); animation: pulseMythic 2s infinite;}
+        .rarity-Legendary { border-color: #f1c40f; box-shadow: 0 0 10px rgba(241,196,15,0.5); }
+        .rarity-Mythic { border-color: #ff4757; box-shadow: 0 0 20px rgba(255,71,87,0.8); animation: pulseMythic 2s infinite; }
 
-        @keyframes pulseMythic { 0% { box-shadow: 0 0 10px #ff4757; } 50% { box-shadow: 0 0 30px #ff4757; } 100% { box-shadow: 0 0 10px #ff4757; } }
+        @keyframes pulseMythic {
+            0% { box-shadow: 0 0 10px #ff4757; }
+            50% { box-shadow: 0 0 30px #ff4757; }
+            100% { box-shadow: 0 0 10px #ff4757; }
+        }
 
         .ui-icon { width: 60px; height: 60px; margin-bottom: 5px; }
 
-        #in-game-ui { position: absolute; top: 20px; left: 20px; background: rgba(11, 12, 16, 0.85); padding: 15px; border-radius: 10px; border: 2px solid #45a29e; z-index: 5; pointer-events: auto;}
-        .stat { font-size: 18px; font-weight: bold; margin-bottom: 5px;}
+        #in-game-ui { position: absolute; top: 20px; left: 20px; background: rgba(11,12,16,0.85); padding: 15px; border-radius: 10px; border: 2px solid #45a29e; z-index: 5; pointer-events: auto; }
+        .stat { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
         #btn-pause { position: absolute; top: 20px; right: 20px; z-index: 5; background: #1f2833; border: 2px solid #c5c6c7; padding: 10px 20px; }
-        
-        #placement-bar { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(11, 12, 16, 0.9); border: 2px solid #45a29e; border-radius: 12px; display: flex; padding: 10px; z-index: 5; gap: 15px; }
-        .roster-slot { width: 70px; height: 70px; background: #1f2833; border: 2px solid #c5c6c7; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;}
+
+        #placement-bar { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(11,12,16,0.9); border: 2px solid #45a29e; border-radius: 12px; display: flex; padding: 10px; z-index: 5; gap: 15px; }
+        .roster-slot { width: 70px; height: 70px; background: #1f2833; border: 2px solid #c5c6c7; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
         .roster-slot.active { border-color: #f1c40f; box-shadow: 0 0 15px #f1c40f; background: #2a2510; }
-        .roster-cost { position: absolute; bottom: -20px; font-size: 14px; font-weight: bold; color: gold; text-shadow: 1px 1px 2px #000;}
+        .roster-cost { position: absolute; bottom: -20px; font-size: 14px; font-weight: bold; color: gold; text-shadow: 1px 1px 2px #000; }
 
-        /* Upgrade Menu */
-        #upgrade-menu { position: absolute; right: 0; top: 50%; transform: translate(100%, -50%); width: 250px; background: rgba(11,12,16,0.95); border: 2px solid #66fcf1; border-radius: 10px 0 0 10px; display: flex; flex-direction: column; padding: 20px; z-index: 6; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);}
-        #upgrade-menu.open { transform: translate(0, -50%); }
-        .upg-stat { margin-bottom: 10px; font-size: 16px; color: #c5c6c7;}
-        
-        .overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        
-        #tutorial-box { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); background: rgba(11, 12, 16, 0.95); border: 3px solid #66fcf1; padding: 20px; border-radius: 10px; z-index: 50; text-align: center; font-size: 18px; display: none; box-shadow: 0 0 20px rgba(0,0,0,0.8);}
+        #upgrade-menu { position: absolute; right: 0; top: 50%; transform: translate(100%,-50%); width: 250px; background: rgba(11,12,16,0.95); border: 2px solid #66fcf1; border-radius: 10px 0 0 10px; display: flex; flex-direction: column; padding: 20px; z-index: 6; transition: transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275); }
+        #upgrade-menu.open { transform: translate(0,-50%); }
+        .upg-stat { margin-bottom: 10px; font-size: 16px; color: #c5c6c7; }
 
-        /* Summon Animation Styles */
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; }
+
+        #tutorial-box { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); background: rgba(11,12,16,0.95); border: 3px solid #66fcf1; padding: 20px; border-radius: 10px; z-index: 50; text-align: center; font-size: 18px; display: none; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
+
         #summon-anim-container { display: none; flex-direction: column; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; }
         .portal { width: 150px; height: 150px; border-radius: 50%; border: 10px dashed #9b59b6; animation: spin 2s linear infinite, glow 1s ease-in-out infinite alternate; }
         .flash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; opacity: 0; pointer-events: none; }
         .flash-anim { animation: whiteFlash 0.5s ease-out; }
-        
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes glow { from { box-shadow: 0 0 20px #9b59b6, inset 0 0 20px #9b59b6; } to { box-shadow: 0 0 60px #8e44ad, inset 0 0 60px #8e44ad; } }
-        @keyframes whiteFlash { 0% { opacity: 1; } 100% { opacity: 0; } }
-        @keyframes dropIn { 0% { transform: scale(3) translateY(-100px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 
-        .drop-animation { animation: dropIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes glow {
+            from { box-shadow: 0 0 20px #9b59b6, inset 0 0 20px #9b59b6; }
+            to { box-shadow: 0 0 60px #8e44ad, inset 0 0 60px #8e44ad; }
+        }
+        @keyframes whiteFlash { 0% { opacity: 1; } 100% { opacity: 0; } }
+        @keyframes dropIn {
+            0% { transform: scale(3) translateY(-100px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .drop-animation { animation: dropIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards; }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 34px; }
+            .grid { gap: 10px; margin: 10px; }
+            .card { width: 95px; height: 140px; }
+            #placement-bar { gap: 5px; padding: 5px; bottom: 10px; max-width: 95vw; }
+            .roster-slot { width: 55px; height: 60px; }
+            .roster-slot svg { width: 32px; height: 32px; }
+            #in-game-ui { top: 8px; left: 8px; padding: 8px; }
+            .stat { font-size: 14px; }
+            #upgrade-menu { width: 210px; padding: 12px; }
+        }
     </style>
 </head>
 <body>
@@ -81,28 +99,26 @@
         <button class="btn" id="btn-play" onclick="showScreen('screen-map')">Play</button>
         <button class="btn" id="btn-summon" onclick="showScreen('screen-summon')">Summon Hero</button>
         <button class="btn" id="btn-inventory" onclick="openInventory()">Barracks (Equip)</button>
-        <button class="btn" onclick="openIndex()" style="background: #2c3e50; border-color: #bdc3c7;">Hero Index</button>
-        <button class="btn" onclick="resetSaveData()" style="font-size: 12px; padding: 5px; margin-top: 50px; border-color: red;">Erase Save Data</button>
+        <button class="btn" onclick="openIndex()" style="background:#2c3e50;border-color:#bdc3c7;">Hero Index</button>
+        <button class="btn" onclick="resetSaveData()" style="font-size:12px;padding:5px;margin-top:50px;border-color:red;">Erase Save Data</button>
     </div>
 
     <div id="screen-summon" class="screen">
         <h2>Summoning Portal</h2>
-        <p style="color: #c5c6c7;">Cost: 100 💎 (Duplicates Refund 50 Shards!)</p>
-        
-        <div id="summon-result-container" style="height: 300px; display: flex; align-items: center; justify-content: center;">
-            <div id="summon-result" class="card" style="display:none; width:200px; height:260px;">
-                <div id="summon-rarity" style="font-size: 14px; font-weight: bold; margin-bottom: 10px;">Rarity</div>
-                <svg class="ui-icon" id="summon-icon" viewBox="0 0 100 100" style="width: 80px; height: 80px;"></svg>
-                <div style="font-size: 22px; font-weight: bold; margin-top: 10px; text-align: center;" id="summon-name">Hero</div>
+        <p style="color:#c5c6c7;">Cost: 100 💎 (Duplicates Refund 50 Shards!)</p>
+        <div id="summon-result-container" style="height:300px;display:flex;align-items:center;justify-content:center;">
+            <div id="summon-result" class="card" style="display:none;width:200px;height:260px;">
+                <div id="summon-rarity" style="font-size:14px;font-weight:bold;margin-bottom:10px;">Rarity</div>
+                <svg class="ui-icon" id="summon-icon" viewBox="0 0 100 100" style="width:80px;height:80px;"></svg>
+                <div style="font-size:22px;font-weight:bold;margin-top:10px;text-align:center;" id="summon-name">Hero</div>
             </div>
         </div>
-
         <button class="btn" onclick="performSummon()" id="btn-do-summon">Summon!</button>
         <button class="btn" onclick="showScreen('screen-menu')" style="border-color:#555;">Back</button>
     </div>
 
     <div id="summon-anim-container">
-        <h2 style="color: #9b59b6; margin-bottom: 30px; font-size: 30px; letter-spacing: 5px;">OPENING RIFT...</h2>
+        <h2 style="color:#9b59b6;margin-bottom:30px;font-size:30px;letter-spacing:5px;">OPENING RIFT...</h2>
         <div class="portal"></div>
         <div id="anim-flash" class="flash"></div>
     </div>
@@ -110,420 +126,685 @@
     <div id="screen-inventory" class="screen">
         <h2>Barracks (Equip up to 5)</h2>
         <div class="grid" id="inv-grid"></div>
-        <div style="display: flex; gap: 15px; margin-top: 20px;">
+        <div style="display:flex;gap:15px;margin-top:20px;">
             <button class="btn" onclick="equipSelected()">Equip</button>
-            <button class="btn" onclick="unequipSelected()" style="border-color:#e74c3c; color: #e74c3c;">Unequip</button>
+            <button class="btn" onclick="unequipSelected()" style="border-color:#e74c3c;color:#e74c3c;">Unequip</button>
             <button class="btn" onclick="showScreen('screen-menu')" style="border-color:#555;">Back</button>
         </div>
     </div>
 
     <div id="screen-index" class="screen">
         <h2>Hero Collection</h2>
-        <div class="grid" id="index-grid" style="max-height: 60vh; overflow-y: auto; padding: 10px;"></div>
-        <button class="btn" onclick="showScreen('screen-menu')" style="border-color:#555; margin-top: 20px;">Back</button>
+        <div class="grid" id="index-grid" style="max-height:60vh;overflow-y:auto;padding:10px;"></div>
+        <button class="btn" onclick="showScreen('screen-menu')" style="border-color:#555;margin-top:20px;">Back</button>
     </div>
 
     <div id="screen-map" class="screen">
         <h2>Select Difficulty</h2>
         <div class="grid">
-            <button class="btn diff-btn" id="btn-easy" onclick="setDifficulty('easy')" style="border-color: #2ecc71;">Easy Mode</button>
-            <button class="btn diff-btn" id="btn-hard" onclick="setDifficulty('hard')" style="border-color: #f1c40f;">Hard Mode</button>
-            <button class="btn diff-btn" id="btn-extreme" onclick="setDifficulty('extreme')" style="border-color: #e67e22;">Extreme Mode</button>
-            <button class="btn diff-btn" id="btn-impossible" onclick="setDifficulty('impossible')" style="border-color: #e74c3c; background: #4a0000;">IMPOSSIBLE</button>
+            <button class="btn diff-btn" id="btn-easy" onclick="setDifficulty('easy')" style="border-color:#2ecc71;">Easy Mode</button>
+            <button class="btn diff-btn" id="btn-hard" onclick="setDifficulty('hard')" style="border-color:#f1c40f;">Hard Mode</button>
+            <button class="btn diff-btn" id="btn-extreme" onclick="setDifficulty('extreme')" style="border-color:#e67e22;">Extreme Mode</button>
+            <button class="btn diff-btn" id="btn-impossible" onclick="setDifficulty('impossible')" style="border-color:#e74c3c;background:#4a0000;">IMPOSSIBLE</button>
         </div>
-        <button class="btn" id="btn-start-game" onclick="startGame()" style="font-size: 24px; padding: 15px 40px; margin-top: 30px;">Start Battle</button>
+        <button class="btn" id="btn-start-game" onclick="startGame()" style="font-size:24px;padding:15px 40px;margin-top:30px;">Start Battle</button>
         <button class="btn" onclick="showScreen('screen-menu')" style="border-color:#555;">Back</button>
     </div>
 
-    <div id="screen-game" class="screen" style="background: transparent; overflow: hidden;">
+    <div id="screen-game" class="screen" style="background:transparent;overflow:hidden;">
         <canvas id="gameCanvas"></canvas>
-        
+
         <div id="in-game-ui">
-            <div class="stat">Gold: <span id="game-gold" style="color: gold;">100</span></div>
-            <div class="stat">Base HP: <span id="game-lives" style="color: #e74c3c;">10</span></div>
+            <div class="stat">Gold: <span id="game-gold" style="color:gold;">100</span></div>
+            <div class="stat">Base HP: <span id="game-lives" style="color:#e74c3c;">10</span></div>
             <div class="stat">Wave: <span id="game-wave">0</span> / 20</div>
-            <button class="btn" onclick="startWave()" style="padding: 8px 15px; font-size: 14px; margin-top: 10px;" id="btn-next-wave">Start Wave</button>
+            <button class="btn" onclick="startWave()" style="padding:8px 15px;font-size:14px;margin-top:10px;" id="btn-next-wave">Start Wave</button>
         </div>
 
         <button class="btn" id="btn-pause" onclick="togglePause()">II Pause</button>
-
         <div id="placement-bar"></div>
 
         <div id="upgrade-menu">
-            <h3 style="color: #66fcf1; margin-top: 0; text-align: center;" id="upg-title">Hero</h3>
+            <h3 style="color:#66fcf1;margin-top:0;text-align:center;" id="upg-title">Hero</h3>
             <div class="upg-stat">Level: <span id="upg-lvl">1</span> / 5</div>
             <div class="upg-stat">Damage: <span id="upg-dmg">0</span></div>
             <div class="upg-stat">Range: <span id="upg-rng">0</span></div>
-            <hr style="border-color: #45a29e; width: 100%;">
-            <button class="btn" id="btn-merge" onclick="mergeTower()" style="font-size: 14px; padding: 10px; border-color: #9b59b6; color: #9b59b6; display: none; width: 90%; margin: 5px auto;">Merge (3)</button>
-            <button class="btn" id="btn-upgrade" onclick="buyUpgrade()" style="font-size: 14px; padding: 10px;">Upgrade (<span id="upg-cost">50</span>g)</button>
-            <button class="btn" id="btn-sell" onclick="sellTower()" style="font-size: 14px; padding: 10px; border-color: #e74c3c; color: #e74c3c;">Sell (<span id="sell-val">25</span>g)</button>
-            <button class="btn" onclick="closeUpgradeMenu()" style="font-size: 12px; padding: 5px; border-color: #555;">Close</button>
+            <hr style="border-color:#45a29e;width:100%;">
+            <button class="btn" id="btn-merge" onclick="mergeTower()" style="font-size:14px;padding:10px;border-color:#9b59b6;color:#9b59b6;display:none;width:90%;margin:5px auto;">Merge (3)</button>
+            <button class="btn" id="btn-upgrade" onclick="buyUpgrade()" style="font-size:14px;padding:10px;">Upgrade (<span id="upg-cost">50</span>g)</button>
+            <button class="btn" id="btn-sell" onclick="sellTower()" style="font-size:14px;padding:10px;border-color:#e74c3c;color:#e74c3c;">Sell (<span id="sell-val">25</span>g)</button>
+            <button class="btn" onclick="closeUpgradeMenu()" style="font-size:12px;padding:5px;border-color:#555;">Close</button>
         </div>
 
         <div id="tutorial-box"></div>
     </div>
 
     <div id="pause-overlay" class="overlay">
-        <h1 style="font-size: 60px;">PAUSED</h1>
+        <h1 style="font-size:60px;">PAUSED</h1>
         <button class="btn" onclick="togglePause()">Resume</button>
-        <button class="btn" onclick="exitToMenu()" style="border-color: #e74c3c; color: #e74c3c;">Exit to Menu</button>
+        <button class="btn" onclick="exitToMenu()" style="border-color:#e74c3c;color:#e74c3c;">Exit to Menu</button>
     </div>
 
     <div id="endless-overlay" class="overlay">
-        <h1 style="color: #2ecc71;">VICTORY!</h1>
-        <p style="font-size: 20px; color: white;">You beat wave 20! Do you want to continue infinitely?</p>
+        <h1 style="color:#2ecc71;">VICTORY!</h1>
+        <p style="font-size:20px;color:white;">You beat wave 20! Do you want to continue infinitely?</p>
         <button class="btn" onclick="continueEndless()">Keep Playing</button>
         <button class="btn" onclick="exitToMenu()">Return to Menu</button>
     </div>
 </div>
 
 <script>
-// ==========================================
-// ANTI-CHEAT ENCRYPTION VAULT (IIFE)
-// ==========================================
 (() => {
-    
-    // --- MASSIVE HERO DATABASE ---
+    // ==========================================
+    // DEFENDERS OF THE REALM - HERO DATABASE
+    // ==========================================
+
     const HERO_DB = {
         // COMMONS
-        peasant: { id: 'peasant', name: 'Peasant', rarity: 'Common', cost: 15, dmg: 5, range: 80, cd: 30, projSpeed: 5, color: '#bdc3c7', svg: '<rect x="40" y="40" width="20" height="20" fill="#bdc3c7"/>' },
-        militia: { id: 'militia', name: 'Militia', rarity: 'Common', cost: 30, dmg: 10, range: 120, cd: 25, projSpeed: 8, color: '#95a5a6', svg: '<rect x="35" y="35" width="30" height="30" fill="#95a5a6"/><circle cx="50" cy="50" r="5" fill="#fff"/>' },
-        brute: { id: 'brute', name: 'Brute', rarity: 'Common', cost: 35, dmg: 35, range: 90, cd: 40, projSpeed: 10, color: '#7f8c8d', svg: '<rect x="30" y="30" width="40" height="40" fill="#7f8c8d"/>' },
-        archer: { id: 'archer', name: 'Archer', rarity: 'Common', cost: 40, dmg: 15, range: 180, cd: 20, projSpeed: 12, color: '#2ecc71', svg: '<polygon points="50,20 65,80 35,80" fill="#2ecc71"/>' },
-        squire: { id: 'squire', name: 'Squire', rarity: 'Common', cost: 50, dmg: 25, range: 100, cd: 30, projSpeed: 15, color: '#bdc3c7', svg: '<rect x="30" y="30" width="40" height="40" fill="#bdc3c7"/><line x1="50" y1="70" x2="50" y2="10" stroke="#7f8c8d" stroke-width="6"/>' },
-        trapper: { id: 'trapper', name: 'Trapper', rarity: 'Common', cost: 45, dmg: 12, range: 150, cd: 15, projSpeed: 10, color: '#e67e22', svg: '<circle cx="50" cy="50" r="25" fill="#e67e22" stroke="#d35400" stroke-width="4"/>' },
-        rogue: { id: 'rogue', name: 'Rogue', rarity: 'Common', cost: 40, dmg: 18, range: 85, cd: 10, projSpeed: 20, color: '#34495e', svg: '<polygon points="40,20 60,20 50,80" fill="#34495e"/>' },
-        
+        peasant: { id:'peasant', name:'Peasant', rarity:'Common', cost:15, dmg:5, range:80, cd:30, projSpeed:5, color:'#bdc3c7', svg:'<rect x="40" y="40" width="20" height="20" fill="#bdc3c7"/>' },
+        militia: { id:'militia', name:'Militia', rarity:'Common', cost:30, dmg:10, range:120, cd:25, projSpeed:8, color:'#95a5a6', svg:'<rect x="35" y="35" width="30" height="30" fill="#95a5a6"/><circle cx="50" cy="50" r="5" fill="#fff"/>' },
+        brute: { id:'brute', name:'Brute', rarity:'Common', cost:35, dmg:35, range:90, cd:40, projSpeed:10, color:'#7f8c8d', svg:'<rect x="30" y="30" width="40" height="40" fill="#7f8c8d"/>' },
+        archer: { id:'archer', name:'Archer', rarity:'Common', cost:40, dmg:15, range:180, cd:20, projSpeed:12, color:'#2ecc71', svg:'<polygon points="50,20 65,80 35,80" fill="#2ecc71"/>' },
+        squire: { id:'squire', name:'Squire', rarity:'Common', cost:50, dmg:25, range:100, cd:30, projSpeed:15, color:'#bdc3c7', svg:'<rect x="30" y="30" width="40" height="40" fill="#bdc3c7"/><line x1="50" y1="70" x2="50" y2="10" stroke="#7f8c8d" stroke-width="6"/>' },
+        trapper: { id:'trapper', name:'Trapper', rarity:'Common', cost:45, dmg:12, range:150, cd:15, projSpeed:10, color:'#e67e22', svg:'<circle cx="50" cy="50" r="25" fill="#e67e22" stroke="#d35400" stroke-width="4"/>' },
+        rogue: { id:'rogue', name:'Rogue', rarity:'Common', cost:40, dmg:18, range:85, cd:10, projSpeed:20, color:'#34495e', svg:'<polygon points="40,20 60,20 50,80" fill="#34495e"/>' },
+
         // RARES
-        knight: { id: 'knight', name: 'Knight', rarity: 'Rare', cost: 80, dmg: 45, range: 110, cd: 35, projSpeed: 15, color: '#3498db', svg: '<rect x="25" y="25" width="50" height="50" fill="#3498db"/><line x1="50" y1="75" x2="50" y2="5" stroke="#ecf0f1" stroke-width="8"/>' },
-        hunter: { id: 'hunter', name: 'Bounty Hunter', rarity: 'Rare', cost: 90, dmg: 40, range: 220, cd: 18, projSpeed: 16, color: '#8e44ad', svg: '<polygon points="50,10 90,50 50,90 10,50" fill="#8e44ad"/>' },
-        sniper: { id: 'sniper', name: 'Sniper', rarity: 'Rare', cost: 100, dmg: 80, range: 350, cd: 60, projSpeed: 20, color: '#2c3e50', svg: '<circle cx="50" cy="50" r="30" fill="#2c3e50"/><circle cx="50" cy="50" r="10" fill="#e74c3c"/>' },
-        ninja: { id: 'ninja', name: 'Ninja', rarity: 'Rare', cost: 90, dmg: 30, range: 160, cd: 12, projSpeed: 18, color: '#34495e', svg: '<polygon points="50,10 80,50 50,90 20,50" fill="#34495e"/><circle cx="50" cy="50" r="8" fill="#e74c3c"/>' },
-        mage: { id: 'mage', name: 'Mage', rarity: 'Rare', cost: 120, dmg: 55, range: 200, cd: 45, projSpeed: 7, color: '#9b59b6', svg: '<polygon points="50,20 80,80 20,80" fill="#9b59b6"/><circle cx="50" cy="20" r="10" fill="#8e44ad"/>' },
-        gunner: { id: 'gunner', name: 'Gunner', rarity: 'Rare', cost: 110, dmg: 20, range: 140, cd: 8, projSpeed: 25, color: '#f39c12', svg: '<rect x="40" y="20" width="20" height="60" fill="#f39c12"/><circle cx="50" cy="20" r="8" fill="#fff"/>' },
-        berserker: { id: 'berserker', name: 'Berserker', rarity: 'Rare', cost: 130, dmg: 75, range: 90, cd: 20, projSpeed: 20, color: '#c0392b', svg: '<polygon points="10,10 90,10 50,90" fill="#c0392b"/>' },
-        cyborg: { id: 'cyborg', name: 'Cyborg', rarity: 'Rare', cost: 115, dmg: 45, range: 180, cd: 15, projSpeed: 40, color: '#00cec9', svg: '<circle cx="50" cy="50" r="20" fill="#00cec9"/><rect x="50" y="45" width="30" height="10" fill="#fff"/>' },
-        witch: { id: 'witch', name: 'Witch', rarity: 'Rare', cost: 125, dmg: 50, range: 190, cd: 35, projSpeed: 12, color: '#8e44ad', svg: '<polygon points="50,10 70,50 30,50" fill="#8e44ad"/><rect x="40" y="50" width="20" height="30" fill="#2c3e50"/>' },
+        knight: { id:'knight', name:'Knight', rarity:'Rare', cost:80, dmg:45, range:110, cd:35, projSpeed:15, color:'#3498db', svg:'<rect x="25" y="25" width="50" height="50" fill="#3498db"/><line x1="50" y1="75" x2="50" y2="5" stroke="#ecf0f1" stroke-width="8"/>' },
+        hunter: { id:'hunter', name:'Bounty Hunter', rarity:'Rare', cost:90, dmg:40, range:220, cd:18, projSpeed:16, color:'#8e44ad', svg:'<polygon points="50,10 90,50 50,90 10,50" fill="#8e44ad"/>' },
+        sniper: { id:'sniper', name:'Sniper', rarity:'Rare', cost:100, dmg:80, range:350, cd:60, projSpeed:20, color:'#2c3e50', svg:'<circle cx="50" cy="50" r="30" fill="#2c3e50"/><circle cx="50" cy="50" r="10" fill="#e74c3c"/>' },
+        ninja: { id:'ninja', name:'Ninja', rarity:'Rare', cost:90, dmg:30, range:160, cd:12, projSpeed:18, color:'#34495e', svg:'<polygon points="50,10 80,50 50,90 20,50" fill="#34495e"/><circle cx="50" cy="50" r="8" fill="#e74c3c"/>' },
+        mage: { id:'mage', name:'Mage', rarity:'Rare', cost:120, dmg:55, range:200, cd:45, projSpeed:7, color:'#9b59b6', svg:'<polygon points="50,20 80,80 20,80" fill="#9b59b6"/><circle cx="50" cy="20" r="10" fill="#8e44ad"/>' },
+        gunner: { id:'gunner', name:'Gunner', rarity:'Rare', cost:110, dmg:20, range:140, cd:8, projSpeed:25, color:'#f39c12', svg:'<rect x="40" y="20" width="20" height="60" fill="#f39c12"/><circle cx="50" cy="20" r="8" fill="#fff"/>' },
+        berserker: { id:'berserker', name:'Berserker', rarity:'Rare', cost:130, dmg:75, range:90, cd:20, projSpeed:20, color:'#c0392b', svg:'<polygon points="10,10 90,10 50,90" fill="#c0392b"/>' },
+        cyborg: { id:'cyborg', name:'Cyborg', rarity:'Rare', cost:115, dmg:45, range:180, cd:15, projSpeed:40, color:'#00cec9', svg:'<circle cx="50" cy="50" r="20" fill="#00cec9"/><rect x="50" y="45" width="30" height="10" fill="#fff"/>' },
+        witch: { id:'witch', name:'Witch', rarity:'Rare', cost:125, dmg:50, range:190, cd:35, projSpeed:12, color:'#8e44ad', svg:'<polygon points="50,10 70,50 30,50" fill="#8e44ad"/><rect x="40" y="50" width="20" height="30" fill="#2c3e50"/>' },
 
         // EPICS
-        paladin: { id: 'paladin', name: 'Paladin', rarity: 'Epic', cost: 180, dmg: 90, range: 130, cd: 40, projSpeed: 15, color: '#f1c40f', svg: '<rect x="20" y="20" width="60" height="60" fill="#f1c40f"/><line x1="50" y1="80" x2="50" y2="0" stroke="#fff" stroke-width="10"/><line x1="20" y1="30" x2="80" y2="30" stroke="#fff" stroke-width="10"/>' },
-        pyro: { id: 'pyro', name: 'Pyromancer', rarity: 'Epic', cost: 160, dmg: 40, range: 180, cd: 8, projSpeed: 12, color: '#e74c3c', svg: '<path d="M50,10 Q80,50 50,90 Q20,50 50,10" fill="#e74c3c"/><circle cx="50" cy="60" r="15" fill="#f1c40f"/>' },
-        frost: { id: 'frost', name: 'Frost Mage', rarity: 'Epic', cost: 170, dmg: 120, range: 220, cd: 70, projSpeed: 5, color: '#00cec9', svg: '<polygon points="50,10 70,50 50,90 30,50" fill="#00cec9"/><polygon points="30,30 70,30 70,70 30,70" fill="none" stroke="#fff" stroke-width="4"/>' },
-        assassin: { id: 'assassin', name: 'Assassin', rarity: 'Epic', cost: 150, dmg: 150, range: 100, cd: 50, projSpeed: 25, color: '#8e44ad', svg: '<polygon points="50,5 90,95 50,75 10,95" fill="#8e44ad"/>' },
-        warden: { id: 'warden', name: 'Warden', rarity: 'Epic', cost: 210, dmg: 140, range: 280, cd: 55, projSpeed: 22, color: '#16a085', svg: '<circle cx="50" cy="50" r="25" fill="#16a085"/><polygon points="30,50 70,50 50,10" fill="#fff"/>' },
-        engineer: { id: 'engineer', name: 'Engineer', rarity: 'Epic', cost: 230, dmg: 60, range: 160, cd: 5, projSpeed: 30, color: '#7f8c8d', svg: '<rect x="25" y="25" width="50" height="50" fill="#7f8c8d"/><circle cx="50" cy="50" r="10" fill="#f1c40f"/>' },
-        bloodmage: { id: 'bloodmage', name: 'Blood Mage', rarity: 'Epic', cost: 240, dmg: 200, range: 150, cd: 45, projSpeed: 18, color: '#8b0000', svg: '<polygon points="50,90 20,40 80,40" fill="#8b0000"/><circle cx="50" cy="30" r="15" fill="#e74c3c"/>' },
-        beastmaster: { id: 'beastmaster', name: 'Beastmaster', rarity: 'Epic', cost: 200, dmg: 80, range: 190, cd: 20, projSpeed: 14, color: '#d35400', svg: '<circle cx="50" cy="50" r="30" fill="#d35400"/><circle cx="40" cy="40" r="5" fill="#fff"/><circle cx="60" cy="40" r="5" fill="#fff"/>' },
-        shaman: { id: 'shaman', name: 'Shaman', rarity: 'Epic', cost: 195, dmg: 100, range: 200, cd: 45, projSpeed: 15, color: '#27ae60', svg: '<polygon points="50,20 70,80 30,80" fill="#27ae60"/><circle cx="50" cy="50" r="10" fill="#f1c40f"/>' },
-        gargoyle: { id: 'gargoyle', name: 'Gargoyle', rarity: 'Epic', cost: 220, dmg: 250, range: 140, cd: 65, projSpeed: 8, color: '#7f8c8d', svg: '<polygon points="20,80 80,80 50,20" fill="#7f8c8d"/><rect x="40" y="80" width="20" height="10" fill="#2c3e50"/>' },
+        paladin: { id:'paladin', name:'Paladin', rarity:'Epic', cost:180, dmg:90, range:130, cd:40, projSpeed:15, color:'#f1c40f', svg:'<rect x="20" y="20" width="60" height="60" fill="#f1c40f"/><line x1="50" y1="80" x2="50" y2="0" stroke="#fff" stroke-width="10"/><line x1="20" y1="30" x2="80" y2="30" stroke="#fff" stroke-width="10"/>' },
+        pyro: { id:'pyro', name:'Pyromancer', rarity:'Epic', cost:160, dmg:40, range:180, cd:8, projSpeed:12, color:'#e74c3c', svg:'<path d="M50,10 Q80,50 50,90 Q20,50 50,10" fill="#e74c3c"/><circle cx="50" cy="60" r="15" fill="#f1c40f"/>' },
+        frost: { id:'frost', name:'Frost Mage', rarity:'Epic', cost:170, dmg:120, range:220, cd:70, projSpeed:5, color:'#00cec9', svg:'<polygon points="50,10 70,50 50,90 30,50" fill="#00cec9"/><polygon points="30,30 70,30 70,70 30,70" fill="none" stroke="#fff" stroke-width="4"/>' },
+        assassin: { id:'assassin', name:'Assassin', rarity:'Epic', cost:150, dmg:150, range:100, cd:50, projSpeed:25, color:'#8e44ad', svg:'<polygon points="50,5 90,95 50,75 10,95" fill="#8e44ad"/>' },
+        warden: { id:'warden', name:'Warden', rarity:'Epic', cost:210, dmg:140, range:280, cd:55, projSpeed:22, color:'#16a085', svg:'<circle cx="50" cy="50" r="25" fill="#16a085"/><polygon points="30,50 70,50 50,10" fill="#fff"/>' },
+        engineer: { id:'engineer', name:'Engineer', rarity:'Epic', cost:230, dmg:60, range:160, cd:5, projSpeed:30, color:'#7f8c8d', svg:'<rect x="25" y="25" width="50" height="50" fill="#7f8c8d"/><circle cx="50" cy="50" r="10" fill="#f1c40f"/>' },
+        bloodmage: { id:'bloodmage', name:'Blood Mage', rarity:'Epic', cost:240, dmg:200, range:150, cd:45, projSpeed:18, color:'#8b0000', svg:'<polygon points="50,90 20,40 80,40" fill="#8b0000"/><circle cx="50" cy="30" r="15" fill="#e74c3c"/>' },
+        beastmaster: { id:'beastmaster', name:'Beastmaster', rarity:'Epic', cost:200, dmg:80, range:190, cd:20, projSpeed:14, color:'#d35400', svg:'<circle cx="50" cy="50" r="30" fill="#d35400"/><circle cx="40" cy="40" r="5" fill="#fff"/><circle cx="60" cy="40" r="5" fill="#fff"/>' },
+        shaman: { id:'shaman', name:'Shaman', rarity:'Epic', cost:195, dmg:100, range:200, cd:45, projSpeed:15, color:'#27ae60', svg:'<polygon points="50,20 70,80 30,80" fill="#27ae60"/><circle cx="50" cy="50" r="10" fill="#f1c40f"/>' },
+        gargoyle: { id:'gargoyle', name:'Gargoyle', rarity:'Epic', cost:220, dmg:250, range:140, cd:65, projSpeed:8, color:'#7f8c8d', svg:'<polygon points="20,80 80,80 50,20" fill="#7f8c8d"/><rect x="40" y="80" width="20" height="10" fill="#2c3e50"/>' },
 
         // LEGENDARIES
-        necro: { id: 'necro', name: 'Necromancer', rarity: 'Legendary', cost: 300, dmg: 200, range: 250, cd: 60, projSpeed: 6, color: '#1abc9c', svg: '<rect x="30" y="20" width="40" height="60" fill="#2c3e50"/><circle cx="50" cy="35" r="12" fill="#1abc9c"/><line x1="50" y1="50" x2="50" y2="70" stroke="#1abc9c" stroke-width="4"/>' },
-        valkyrie: { id: 'valkyrie', name: 'Valkyrie', rarity: 'Legendary', cost: 350, dmg: 180, range: 300, cd: 40, projSpeed: 20, color: '#fdcb6e', svg: '<polygon points="20,50 50,10 80,50 50,90" fill="#fdcb6e"/><circle cx="50" cy="50" r="15" fill="#fff"/>' },
-        dragon: { id: 'dragon', name: 'Dragon', rarity: 'Legendary', cost: 500, dmg: 300, range: 200, cd: 30, projSpeed: 10, color: '#d63031', svg: '<polygon points="10,20 90,20 50,90" fill="#d63031"/><circle cx="35" cy="40" r="8" fill="#f1c40f"/><circle cx="65" cy="40" r="8" fill="#f1c40f"/>' },
-        mech: { id: 'mech', name: 'Titan Mech', rarity: 'Legendary', cost: 600, dmg: 500, range: 400, cd: 100, projSpeed: 30, color: '#636e72', svg: '<rect x="15" y="15" width="70" height="70" fill="#636e72" stroke="#2d3436" stroke-width="5"/><circle cx="50" cy="50" r="20" fill="#0984e3"/>' },
-        phantom: { id: 'phantom', name: 'Phantom', rarity: 'Legendary', cost: 650, dmg: 250, range: 250, cd: 15, projSpeed: 35, color: '#5f27cd', svg: '<path d="M20,80 Q50,0 80,80 Q50,60 20,80" fill="#5f27cd"/><circle cx="50" cy="40" r="5" fill="#fff"/>' },
-        storm: { id: 'storm', name: 'Storm', rarity: 'Legendary', cost: 700, dmg: 650, range: 320, cd: 80, projSpeed: 50, color: '#48dbfb', svg: '<polygon points="60,10 30,50 50,50 40,90 70,50 50,50" fill="#48dbfb"/>' },
-        zeus: { id: 'zeus', name: 'Zeus', rarity: 'Legendary', cost: 800, dmg: 900, range: 450, cd: 70, projSpeed: 60, color: '#f9ca24', svg: '<polygon points="60,10 40,50 50,50 30,90 80,40 50,45" fill="#f9ca24"/>' },
-        timeweaver: { id: 'timeweaver', name: 'Time Weaver', rarity: 'Legendary', cost: 750, dmg: 100, range: 500, cd: 4, projSpeed: 45, color: '#00cec9', svg: '<circle cx="50" cy="50" r="30" fill="none" stroke="#00cec9" stroke-width="8"/><line x1="50" y1="50" x2="50" y2="30" stroke="#00cec9" stroke-width="4"/><line x1="50" y1="50" x2="70" y2="50" stroke="#00cec9" stroke-width="4"/>' },
-        poseidon: { id: 'poseidon', name: 'Poseidon', rarity: 'Legendary', cost: 550, dmg: 350, range: 300, cd: 45, projSpeed: 25, color: '#0984e3', svg: '<polygon points="50,10 70,30 60,30 60,90 40,90 40,30 30,30" fill="#0984e3"/>' },
-        phoenix: { id: 'phoenix', name: 'Phoenix', rarity: 'Legendary', cost: 720, dmg: 550, range: 350, cd: 35, projSpeed: 20, color: '#e67e22', svg: '<path d="M50,20 Q80,50 50,80 Q20,50 50,20" fill="#e67e22"/><circle cx="50" cy="40" r="10" fill="#f1c40f"/>' },
-        
-        // MYTHIC
-        jester: { id: 'jester', name: 'The Jester', rarity: 'Mythic', cost: 999, dmg: 2500, range: 500, cd: 20, projSpeed: 80, color: '#ff4757', svg: '<circle cx="50" cy="50" r="40" fill="#ff4757"/><polygon points="10,50 50,10 90,50 50,90" fill="#2f3542"/><circle cx="30" cy="40" r="5" fill="#fff"/><circle cx="70" cy="40" r="5" fill="#fff"/><path d="M30,70 Q50,90 70,70" stroke="#fff" stroke-width="5" fill="none"/>' },
-        sungod: { id: 'sungod', name: 'Sun God', rarity: 'Mythic', cost: 1200, dmg: 5000, range: 600, cd: 30, projSpeed: 100, color: '#f39c12', svg: '<circle cx="50" cy="50" r="20" fill="#f39c12"/><path d="M50,10 L50,30 M50,90 L50,70 M10,50 L30,50 M90,50 L70,50 M20,20 L35,35 M80,80 L65,65 M20,80 L35,65 M80,20 L65,35" stroke="#f1c40f" stroke-width="6"/>' },
-        reaper: { id: 'reaper', name: 'Grim Reaper', rarity: 'Mythic', cost: 1500, dmg: 6666, range: 250, cd: 50, projSpeed: 50, color: '#2d3436', svg: '<path d="M40,20 Q60,10 80,30 Q70,40 50,30 L50,90 L40,90 Z" fill="#2d3436"/><circle cx="50" cy="50" r="8" fill="#e74c3c"/>' },
-        cthulhu: { id: 'cthulhu', name: 'Cthulhu', rarity: 'Mythic', cost: 1800, dmg: 9999, range: 700, cd: 100, projSpeed: 15, color: '#10ac84', svg: '<circle cx="50" cy="40" r="25" fill="#10ac84"/><path d="M40,60 Q30,90 20,80 M50,65 Q50,100 50,90 M60,60 Q70,90 80,80" stroke="#10ac84" stroke-width="8" fill="none"/>' }
+        necro: { id:'necro', name:'Necromancer', rarity:'Legendary', cost:300, dmg:200, range:250, cd:60, projSpeed:6, color:'#1abc9c', svg:'<rect x="30" y="20" width="40" height="60" fill="#2c3e50"/><circle cx="50" cy="35" r="12" fill="#1abc9c"/><line x1="50" y1="50" x2="50" y2="70" stroke="#1abc9c" stroke-width="4"/>' },
+        valkyrie: { id:'valkyrie', name:'Valkyrie', rarity:'Legendary', cost:350, dmg:180, range:300, cd:40, projSpeed:20, color:'#fdcb6e', svg:'<polygon points="20,50 50,10 80,50 50,90" fill="#fdcb6e"/><circle cx="50" cy="50" r="15" fill="#fff"/>' },
+        dragon: { id:'dragon', name:'Dragon', rarity:'Legendary', cost:500, dmg:300, range:200, cd:30, projSpeed:10, color:'#d63031', svg:'<polygon points="10,20 90,20 50,90" fill="#d63031"/><circle cx="35" cy="40" r="8" fill="#f1c40f"/><circle cx="65" cy="40" r="8" fill="#f1c40f"/>' },
+        mech: { id:'mech', name:'Titan Mech', rarity:'Legendary', cost:600, dmg:500, range:400, cd:100, projSpeed:30, color:'#636e72', svg:'<rect x="15" y="15" width="70" height="70" fill="#636e72" stroke="#2d3436" stroke-width="5"/><circle cx="50" cy="50" r="20" fill="#0984e3"/>' },
+        phantom: { id:'phantom', name:'Phantom', rarity:'Legendary', cost:650, dmg:250, range:250, cd:15, projSpeed:35, color:'#5f27cd', svg:'<path d="M20,80 Q50,0 80,80 Q50,60 20,80" fill="#5f27cd"/><circle cx="50" cy="40" r="5" fill="#fff"/>' },
+        storm: { id:'storm', name:'Storm', rarity:'Legendary', cost:700, dmg:650, range:320, cd:80, projSpeed:50, color:'#48dbfb', svg:'<polygon points="60,10 30,50 50,50 40,90 70,50 50,50" fill="#48dbfb"/>' },
+        zeus: { id:'zeus', name:'Zeus', rarity:'Legendary', cost:800, dmg:900, range:450, cd:70, projSpeed:60, color:'#f9ca24', svg:'<polygon points="60,10 40,50 50,50 30,90 80,40 50,45" fill="#f9ca24"/>' },
+        timeweaver: { id:'timeweaver', name:'Time Weaver', rarity:'Legendary', cost:750, dmg:100, range:500, cd:4, projSpeed:45, color:'#00cec9', svg:'<circle cx="50" cy="50" r="30" fill="none" stroke="#00cec9" stroke-width="8"/><line x1="50" y1="50" x2="50" y2="30" stroke="#00cec9" stroke-width="4"/><line x1="50" y1="50" x2="70" y2="50" stroke="#00cec9" stroke-width="4"/>' },
+        poseidon: { id:'poseidon', name:'Poseidon', rarity:'Legendary', cost:550, dmg:350, range:300, cd:45, projSpeed:25, color:'#0984e3', svg:'<polygon points="50,10 70,30 60,30 60,90 40,90 40,30 30,30" fill="#0984e3"/>' },
+        phoenix: { id:'phoenix', name:'Phoenix', rarity:'Legendary', cost:720, dmg:550, range:350, cd:35, projSpeed:20, color:'#e67e22', svg:'<path d="M50,20 Q80,50 50,80 Q20,50 50,20" fill="#e67e22"/><circle cx="50" cy="40" r="10" fill="#f1c40f"/>' },
+
+        // MYTHICS
+        jester: { id:'jester', name:'The Jester', rarity:'Mythic', cost:999, dmg:2500, range:500, cd:20, projSpeed:80, color:'#ff4757', svg:'<circle cx="50" cy="50" r="40" fill="#ff4757"/><polygon points="10,50 50,10 90,50 50,90" fill="#2f3542"/><circle cx="30" cy="40" r="5" fill="#fff"/><circle cx="70" cy="40" r="5" fill="#fff"/><path d="M30,70 Q50,90 70,70" stroke="#fff" stroke-width="5" fill="none"/>' },
+        sungod: { id:'sungod', name:'Sun God', rarity:'Mythic', cost:1200, dmg:5000, range:600, cd:30, projSpeed:100, color:'#f39c12', svg:'<circle cx="50" cy="50" r="20" fill="#f39c12"/><path d="M50,10 L50,30 M50,90 L50,70 M10,50 L30,50 M90,50 L70,50 M20,20 L35,35 M80,80 L65,65 M20,80 L35,65 M80,20 L65,35" stroke="#f1c40f" stroke-width="6"/>' },
+        reaper: { id:'reaper', name:'Grim Reaper', rarity:'Mythic', cost:1500, dmg:6666, range:250, cd:50, projSpeed:50, color:'#2d3436', svg:'<path d="M40,20 Q60,10 80,30 Q70,40 50,30 L50,90 L40,90 Z" fill="#2d3436"/><circle cx="50" cy="50" r="8" fill="#e74c3c"/>' },
+        cthulhu: { id:'cthulhu', name:'Cthulhu', rarity:'Mythic', cost:1800, dmg:9999, range:700, cd:100, projSpeed:15, color:'#10ac84', svg:'<circle cx="50" cy="40" r="25" fill="#10ac84"/><path d="M40,60 Q30,90 20,80 M50,65 Q50,100 50,90 M60,60 Q70,90 80,80" stroke="#10ac84" stroke-width="8" fill="none"/>' }
     };
 
-    // --- SECURE SAVE DATA LOGIC ---
-    const SECRET_SALT = "ULTIMATE_CHAOS_KEY";
+    // ==========================================
+    // SAVE SYSTEM
+    // New unique save key:
+    // defenders_realm_save_data
+    // ==========================================
+
+    const SAVE_KEY = 'defenders_realm_save_data';
+    const OLD_ENCRYPTED_SAVE_KEY = 'dotr_save_encrypted';
+    const OLD_SAVE_KEY = 'dotr_save';
+    const SECRET_SALT = 'ULTIMATE_CHAOS_KEY';
+
     let player;
+
+    function createFreshSave() {
+        return {
+            shards: 100,
+            unlocked: ['militia'],
+            equipped: ['militia'],
+            hasSeenMergeTutorial: false
+        };
+    }
+
+    function decodeEncryptedSave(encoded) {
+        const decoded = decodeURIComponent(atob(encoded));
+
+        if (!decoded.endsWith(SECRET_SALT)) {
+            throw new Error('Invalid old save');
+        }
+
+        const json = decoded.slice(0, -SECRET_SALT.length);
+        return JSON.parse(json);
+    }
 
     function saveGame() {
         try {
-            let jsonStr = JSON.stringify(player);
-            let encodedStr = btoa(encodeURIComponent(jsonStr + SECRET_SALT));
-            localStorage.setItem('dotr_save_encrypted', encodedStr);
-        } catch (e) { console.error("Save failed"); }
+            const jsonStr = JSON.stringify(player);
+            const encodedStr = btoa(encodeURIComponent(jsonStr + SECRET_SALT));
+
+            // All new saves use this unique key.
+            localStorage.setItem(SAVE_KEY, encodedStr);
+        } catch (e) {
+            console.error('Defenders of the Realm save failed:', e);
+        }
+
         updateShardsUI();
     }
 
     function loadGame() {
+        let loadedExistingSave = false;
+
+        // 1. Try the new unique save key first.
         try {
-            const savedData = localStorage.getItem('dotr_save_encrypted');
-            if (savedData) {
-                let decodedStr = decodeURIComponent(atob(savedData));
-                if (decodedStr.endsWith(SECRET_SALT)) {
-                    let jsonStr = decodedStr.slice(0, -SECRET_SALT.length);
-                    player = JSON.parse(jsonStr);
-                } else {
-                    throw new Error("Tampered Save");
-                }
-            } else {
-                // 🚨 SAVE DATA RESCUE MISSION 🚨
-                const oldSave = localStorage.getItem('dotr_save');
-                if (oldSave) {
-                    player = JSON.parse(oldSave);
-                    alert("🎉 Old save data successfully rescued and secured!");
-                    // Immediately secure it in the new format so it's safe forever
-                    saveGame(); 
-                } else {
-                    throw new Error("No Save");
-                }
+            const newSave = localStorage.getItem(SAVE_KEY);
+
+            if (newSave) {
+                player = decodeEncryptedSave(newSave);
+                loadedExistingSave = true;
             }
         } catch (e) {
-            // If tampered or absolutely no save exists, start fresh
-            player = { shards: 100, unlocked: ['militia'], equipped: ['militia'], hasSeenMergeTutorial: false };
+            console.error('Could not load the new save:', e);
         }
 
-        // Clean ghost heroes
-        if(player.hasSeenMergeTutorial === undefined) player.hasSeenMergeTutorial = false;
-        player.unlocked = player.unlocked.filter(id => HERO_DB[id]);
-        player.equipped = player.equipped.filter(id => HERO_DB[id]);
+        // 2. If there is no new save, migrate the old encrypted save.
+        if (!loadedExistingSave) {
+            try {
+                const oldEncryptedSave = localStorage.getItem(OLD_ENCRYPTED_SAVE_KEY);
+
+                if (oldEncryptedSave) {
+                    player = decodeEncryptedSave(oldEncryptedSave);
+                    loadedExistingSave = true;
+                }
+            } catch (e) {
+                console.error('Could not load the old encrypted save:', e);
+            }
+        }
+
+        // 3. If needed, try the original legacy, unencrypted save.
+        if (!loadedExistingSave) {
+            try {
+                const oldSave = localStorage.getItem(OLD_SAVE_KEY);
+
+                if (oldSave) {
+                    player = JSON.parse(oldSave);
+                    loadedExistingSave = true;
+                }
+            } catch (e) {
+                console.error('Could not load the legacy save:', e);
+            }
+        }
+
+        // 4. Start a new game only if no usable save was found.
+        if (!loadedExistingSave) {
+            player = createFreshSave();
+        }
+
+        // Repair missing or invalid fields.
+        if (!player || typeof player !== 'object') {
+            player = createFreshSave();
+        }
+
+        if (!Number.isFinite(player.shards) || player.shards < 0) {
+            player.shards = 100;
+        }
+
+        if (!Array.isArray(player.unlocked)) {
+            player.unlocked = ['militia'];
+        }
+
+        if (!Array.isArray(player.equipped)) {
+            player.equipped = ['militia'];
+        }
+
+        if (player.hasSeenMergeTutorial === undefined) {
+            player.hasSeenMergeTutorial = false;
+        }
+
+        // Remove heroes that no longer exist in the database.
+        player.unlocked = [...new Set(player.unlocked.filter(id => HERO_DB[id]))];
+        player.equipped = [...new Set(player.equipped.filter(id => HERO_DB[id]))];
+
+        if (player.unlocked.length === 0) {
+            player.unlocked = ['militia'];
+        }
+
+        player.equipped = player.equipped.filter(id => player.unlocked.includes(id));
+
+        // Migrate the loaded data to the new unique key immediately.
+        // This keeps existing progress and makes future saves use SAVE_KEY.
+        if (loadedExistingSave) {
+            saveGame();
+        }
     }
 
-    loadGame(); // Boot load
+    function updateShardsUI() {
+        const counter = document.getElementById('shard-count');
+        if (counter && player) {
+            counter.innerText = player.shards;
+        }
+    }
+
+    loadGame();
 
     window.resetSaveData = function() {
-        if(confirm("Are you sure you want to delete all progress? This wipes your heroes and shards!")) {
-            localStorage.removeItem('dotr_save_encrypted');
-            localStorage.removeItem('dotr_save'); // Clear old ones too just in case
+        if (confirm('Are you sure you want to delete all progress? This wipes your heroes and shards!')) {
+            localStorage.removeItem(SAVE_KEY);
+            localStorage.removeItem(OLD_ENCRYPTED_SAVE_KEY);
+            localStorage.removeItem(OLD_SAVE_KEY);
             location.reload();
         }
     };
 
-    // --- GAME ENGINE VARIABLES ---
-    let invSelection = null; 
+    // ==========================================
+    // GAME ENGINE VARIABLES
+    // ==========================================
+
+    let invSelection = null;
     let difficulty = 'easy';
-    let waveSpawnsCompleted = true; 
+    let waveSpawnsCompleted = true;
     let waveSpawnsTotal = 0;
     let waveSpawnsCount = 0;
-    let gameEnv = { gold: 100, lives: 10, wave: 0, active: false, isPaused: false, isEndless: false };
-    
-    let nodeRatios = [
-        { rx: 0.2, ry: 0.2 }, { rx: 0.3, ry: 0.45 }, { rx: 0.55, ry: 0.7 },
-        { rx: 0.7, ry: 0.5 }, { rx: 0.85, ry: 0.35 }, { rx: 0.5, ry: 0.2 },
-        { rx: 0.3, ry: 0.8 }, { rx: 0.7, ry: 0.8 }, { rx: 0.15, ry: 0.6 }, { rx: 0.8, ry: 0.1 }
+
+    let gameEnv = {
+        gold: 100,
+        lives: 10,
+        wave: 0,
+        active: false,
+        isPaused: false,
+        isEndless: false
+    };
+
+    const nodeRatios = [
+        { rx:0.2, ry:0.2 },
+        { rx:0.3, ry:0.45 },
+        { rx:0.55, ry:0.7 },
+        { rx:0.7, ry:0.5 },
+        { rx:0.85, ry:0.35 },
+        { rx:0.5, ry:0.2 },
+        { rx:0.3, ry:0.8 },
+        { rx:0.7, ry:0.8 },
+        { rx:0.15, ry:0.6 },
+        { rx:0.8, ry:0.1 }
     ];
-    let nodes = [], deployedHeroes = [], enemies = [], projectiles = [], particles = [];
+
+    let nodes = [];
+    let deployedHeroes = [];
+    let enemies = [];
+    let projectiles = [];
+    let particles = [];
     let path = [];
-    let loopId, spawnInterval;
+    let loopId = null;
+    let spawnInterval = null;
     let selectedHeroToPlace = null;
     let selectedNodeForUpg = null;
 
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
 
-    // --- EXPORTED UI FUNCTIONS ---
+    // ==========================================
+    // SCREEN NAVIGATION
+    // ==========================================
+
     window.showScreen = function(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active-screen');
+        });
+
         document.getElementById(screenId).classList.add('active-screen');
-        document.getElementById('ui-shards').style.display = (screenId === 'screen-game') ? 'none' : 'block';
+
+        document.getElementById('ui-shards').style.display =
+            screenId === 'screen-game' ? 'none' : 'block';
     };
 
-    const updateShardsUI = () => document.getElementById('shard-count').innerText = player.shards;
-    
+    // ==========================================
+    // SUMMONING
+    // ==========================================
+
     window.performSummon = function() {
-        if (player.shards < 100) return alert("Not enough shards! Defeat waves to earn more.");
-        
+        if (player.shards < 100) {
+            alert('Not enough shards! Defeat waves to earn more.');
+            return;
+        }
+
         player.shards -= 100;
-        updateShardsUI();
-        
+        saveGame();
+
         document.getElementById('btn-do-summon').disabled = true;
         document.getElementById('summon-result').style.display = 'none';
-        
+
         const animContainer = document.getElementById('summon-anim-container');
         animContainer.style.display = 'flex';
-        
-        // Exact User Odds (60, 50, 20, 10, 1)
+
+        // Rarity weights: Common 60, Rare 50, Epic 20,
+        // Legendary 10, Mythic 1.
         let pool = [];
-        Object.values(HERO_DB).forEach(h => {
+
+        Object.values(HERO_DB).forEach(hero => {
             let weight = 0;
-            if(h.rarity === 'Common') weight = 60;
-            if(h.rarity === 'Rare') weight = 50;
-            if(h.rarity === 'Epic') weight = 20;
-            if(h.rarity === 'Legendary') weight = 10;
-            if(h.rarity === 'Mythic') weight = 1;
-            for(let i=0; i<weight; i++) pool.push(h.id);
+
+            if (hero.rarity === 'Common') weight = 60;
+            if (hero.rarity === 'Rare') weight = 50;
+            if (hero.rarity === 'Epic') weight = 20;
+            if (hero.rarity === 'Legendary') weight = 10;
+            if (hero.rarity === 'Mythic') weight = 1;
+
+            for (let i = 0; i < weight; i++) {
+                pool.push(hero.id);
+            }
         });
+
         const pulledId = pool[Math.floor(Math.random() * pool.length)];
 
         setTimeout(() => {
             const flash = document.getElementById('anim-flash');
             flash.classList.add('flash-anim');
-            
+
             setTimeout(() => {
                 animContainer.style.display = 'none';
                 flash.classList.remove('flash-anim');
                 document.getElementById('btn-do-summon').disabled = false;
                 executePull(pulledId);
-            }, 400); 
-            
-        }, 2000); 
+            }, 400);
+        }, 2000);
     };
 
     function executePull(id) {
         const hero = HERO_DB[id];
-        let isDuplicate = player.unlocked.includes(id);
+        const isDuplicate = player.unlocked.includes(id);
 
         if (isDuplicate) {
-            player.shards += 50; 
+            player.shards += 50;
         } else {
             player.unlocked.push(id);
         }
+
         saveGame();
-        
+
         const card = document.getElementById('summon-result');
         card.style.display = 'flex';
         card.className = `card rarity-${hero.rarity} drop-animation`;
-        
+
         setTimeout(() => card.classList.remove('drop-animation'), 600);
-        
-        document.getElementById('summon-rarity').innerText = isDuplicate ? "DUPLICATE (+50 💎)" : hero.rarity;
-        document.getElementById('summon-rarity').style.color = isDuplicate ? '#e74c3c' : getRarityColor(hero.rarity);
+
+        document.getElementById('summon-rarity').innerText =
+            isDuplicate ? 'DUPLICATE (+50 💎)' : hero.rarity;
+
+        document.getElementById('summon-rarity').style.color =
+            isDuplicate ? '#e74c3c' : getRarityColor(hero.rarity);
+
         document.getElementById('summon-icon').innerHTML = hero.svg;
         document.getElementById('summon-name').innerText = hero.name;
     }
 
-    function getRarityColor(r) {
-        if(r==='Common') return '#bdc3c7';
-        if(r==='Rare') return '#3498db';
-        if(r==='Epic') return '#9b59b6';
-        if(r==='Legendary') return '#f1c40f';
-        if(r==='Mythic') return '#ff4757';
+    function getRarityColor(rarity) {
+        if (rarity === 'Common') return '#bdc3c7';
+        if (rarity === 'Rare') return '#3498db';
+        if (rarity === 'Epic') return '#9b59b6';
+        if (rarity === 'Legendary') return '#f1c40f';
+        if (rarity === 'Mythic') return '#ff4757';
         return '#fff';
     }
 
-    window.openInventory = function() { showScreen('screen-inventory'); renderInventory(); };
-    
+    // ==========================================
+    // INVENTORY AND HERO INDEX
+    // ==========================================
+
+    window.openInventory = function() {
+        showScreen('screen-inventory');
+        renderInventory();
+    };
+
     function renderInventory() {
-        const grid = document.getElementById('inv-grid'); grid.innerHTML = '';
+        const grid = document.getElementById('inv-grid');
+        grid.innerHTML = '';
+
         player.unlocked.forEach(id => {
-            const h = HERO_DB[id];
+            const hero = HERO_DB[id];
             const div = document.createElement('div');
-            div.className = `card rarity-${h.rarity} ${player.equipped.includes(id) ? 'equipped' : ''} ${invSelection === id ? 'selected' : ''}`;
-            div.innerHTML = `<div style="font-size:10px; font-weight:bold; color:${getRarityColor(h.rarity)}; margin-bottom:5px;">${h.rarity}</div><svg class="ui-icon" viewBox="0 0 100 100">${h.svg}</svg><div style="font-weight:bold; margin-top:5px; text-align:center; font-size:14px;">${h.name}</div><div style="font-size:12px; color:#aaa;">Cost: ${h.cost}</div>`;
-            div.onclick = () => { invSelection = id; renderInventory(); };
+
+            div.className =
+                `card rarity-${hero.rarity} ` +
+                `${player.equipped.includes(id) ? 'equipped' : ''} ` +
+                `${invSelection === id ? 'selected' : ''}`;
+
+            div.innerHTML = `
+                <div style="font-size:10px;font-weight:bold;color:${getRarityColor(hero.rarity)};margin-bottom:5px;">${hero.rarity}</div>
+                <svg class="ui-icon" viewBox="0 0 100 100">${hero.svg}</svg>
+                <div style="font-weight:bold;margin-top:5px;text-align:center;font-size:14px;">${hero.name}</div>
+                <div style="font-size:12px;color:#aaa;">Cost: ${hero.cost}</div>
+            `;
+
+            div.onclick = () => {
+                invSelection = id;
+                renderInventory();
+            };
+
             grid.appendChild(div);
         });
     }
 
     window.openIndex = function() {
         showScreen('screen-index');
-        const grid = document.getElementById('index-grid'); grid.innerHTML = '';
-        const allHeroes = Object.values(HERO_DB).sort((a,b) => a.cost - b.cost);
-        
-        allHeroes.forEach(h => {
-            const isOwned = player.unlocked.includes(h.id);
+
+        const grid = document.getElementById('index-grid');
+        grid.innerHTML = '';
+
+        const allHeroes = Object.values(HERO_DB).sort((a, b) => a.cost - b.cost);
+
+        allHeroes.forEach(hero => {
+            const isOwned = player.unlocked.includes(hero.id);
             const div = document.createElement('div');
-            div.className = `card ${isOwned ? `rarity-${h.rarity}` : 'locked'}`;
+
+            div.className =
+                `card ${isOwned ? `rarity-${hero.rarity}` : 'locked'}`;
+
             div.innerHTML = `
-                <div style="font-size:10px; font-weight:bold; color:${isOwned ? getRarityColor(h.rarity) : '#555'}; margin-bottom:5px;">${h.rarity}</div>
-                <svg class="ui-icon" viewBox="0 0 100 100">${h.svg}</svg>
-                <div style="font-weight:bold; margin-top:5px; text-align:center; font-size:14px;">${isOwned ? h.name : '???'}</div>
-                <div style="font-size:12px; color:#aaa;">Cost: ${h.cost}</div>
+                <div style="font-size:10px;font-weight:bold;color:${isOwned ? getRarityColor(hero.rarity) : '#555'};margin-bottom:5px;">${hero.rarity}</div>
+                <svg class="ui-icon" viewBox="0 0 100 100">${hero.svg}</svg>
+                <div style="font-weight:bold;margin-top:5px;text-align:center;font-size:14px;">${isOwned ? hero.name : '???'}</div>
+                <div style="font-size:12px;color:#aaa;">Cost: ${hero.cost}</div>
             `;
+
             grid.appendChild(div);
         });
     };
 
     window.equipSelected = function() {
         if (!invSelection || player.equipped.includes(invSelection)) return;
-        if (player.equipped.length >= 5) return alert("Max 5 heroes equipped!");
+
+        if (player.equipped.length >= 5) {
+            alert('Max 5 heroes equipped!');
+            return;
+        }
+
         player.equipped.push(invSelection);
-        saveGame(); renderInventory();
+        saveGame();
+        renderInventory();
     };
-    
+
     window.unequipSelected = function() {
         if (!invSelection) return;
+
         player.equipped = player.equipped.filter(id => id !== invSelection);
-        saveGame(); renderInventory();
+        saveGame();
+        renderInventory();
     };
 
     window.setDifficulty = function(diff) {
         difficulty = diff;
-        document.querySelectorAll('.diff-btn').forEach(b => b.style.boxShadow = 'none');
-        document.getElementById(`btn-${diff}`).style.boxShadow = `0 0 20px ${document.getElementById(`btn-${diff}`).style.borderColor}`;
+
+        document.querySelectorAll('.diff-btn').forEach(button => {
+            button.style.boxShadow = 'none';
+        });
+
+        const button = document.getElementById(`btn-${diff}`);
+        button.style.boxShadow = `0 0 20px ${button.style.borderColor}`;
     };
 
-    // --- GAME ENGINE SCRIPT ---
+    // ==========================================
+    // MAP AND CANVAS
+    // ==========================================
+
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         recalculateMap();
     }
+
     window.addEventListener('resize', resizeCanvas);
-    window.addEventListener('keydown', e => { if(e.key === 'Escape' && gameEnv.active) window.togglePause(); });
+
+    window.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && gameEnv.active) {
+            window.togglePause();
+        }
+    });
 
     function recalculateMap() {
-        const w = canvas.width; const h = canvas.height;
-        path = [
-            {x: 0, y: h*0.3}, {x: w*0.4, y: h*0.3}, {x: w*0.4, y: h*0.7}, 
-            {x: w*0.8, y: h*0.7}, {x: w*0.8, y: h*0.2}, {x: w, y: h*0.2}
-        ];
-        if (nodes.length === 0) {
-            nodes = nodeRatios.map(r => ({ x: w * r.rx, y: h * r.ry, radius: 40, occupied: null }));
-        } else {
-            nodes.forEach((n, i) => { n.x = w * nodeRatios[i].rx; n.y = h * nodeRatios[i].ry; });
-        }
-    }
+        const w = canvas.width;
+        const h = canvas.height;
 
-    function spawnParticles(x, y, color, count) {
-        for(let i=0; i<count; i++) {
-            particles.push({
-                x: x, y: y,
-                vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8,
-                life: 1.0, color: color, size: Math.random() * 4 + 2
+        path = [
+            { x:0, y:h*0.3 },
+            { x:w*0.4, y:h*0.3 },
+            { x:w*0.4, y:h*0.7 },
+            { x:w*0.8, y:h*0.7 },
+            { x:w*0.8, y:h*0.2 },
+            { x:w, y:h*0.2 }
+        ];
+
+        if (nodes.length === 0) {
+            nodes = nodeRatios.map(ratio => ({
+                x: w * ratio.rx,
+                y: h * ratio.ry,
+                radius: 40,
+                occupied: null
+            }));
+        } else {
+            nodes.forEach((node, index) => {
+                node.x = w * nodeRatios[index].rx;
+                node.y = h * nodeRatios[index].ry;
             });
         }
     }
 
-    window.startGame = function() {
-        if (player.equipped.length === 0) return alert("Equip a hero first!");
-        showScreen('screen-game');
-        
-        nodes = []; 
-        resizeCanvas();
-        
-        let startGold = 250; let startLives = 20;
-        if(difficulty === 'hard') { startGold = 150; startLives = 10; }
-        if(difficulty === 'extreme') { startGold = 100; startLives = 1; }
-        if(difficulty === 'impossible') { startGold = 50; startLives = 1; }
+    function spawnParticles(x, y, color, count) {
+        for (let i = 0; i < count; i++) {
+            particles.push({
+                x,
+                y,
+                vx: (Math.random() - 0.5) * 8,
+                vy: (Math.random() - 0.5) * 8,
+                life: 1,
+                color,
+                size: Math.random() * 4 + 2
+            });
+        }
+    }
 
-        gameEnv = { gold: startGold, lives: startLives, wave: 0, active: true, isPaused: false, isEndless: false };
-        deployedHeroes = []; enemies = []; projectiles = []; particles = [];
-        selectedHeroToPlace = null; selectedNodeForUpg = null;
-        waveSpawnsCompleted = true; 
+    // ==========================================
+    // START GAME
+    // ==========================================
+
+    window.startGame = function() {
+        if (player.equipped.length === 0) {
+            alert('Equip a hero first!');
+            return;
+        }
+
+        showScreen('screen-game');
+
+        nodes = [];
+        resizeCanvas();
+
+        let startGold = 250;
+        let startLives = 20;
+
+        if (difficulty === 'hard') {
+            startGold = 150;
+            startLives = 10;
+        }
+
+        if (difficulty === 'extreme') {
+            startGold = 100;
+            startLives = 1;
+        }
+
+        if (difficulty === 'impossible') {
+            startGold = 50;
+            startLives = 1;
+        }
+
+        gameEnv = {
+            gold: startGold,
+            lives: startLives,
+            wave: 0,
+            active: true,
+            isPaused: false,
+            isEndless: false
+        };
+
+        deployedHeroes = [];
+        enemies = [];
+        projectiles = [];
+        particles = [];
+
+        selectedHeroToPlace = null;
+        selectedNodeForUpg = null;
+        waveSpawnsCompleted = true;
+
         window.closeUpgradeMenu();
-        
+
+        document.getElementById('pause-overlay').style.display = 'none';
+        document.getElementById('endless-overlay').style.display = 'none';
+        document.getElementById('tutorial-box').style.display = 'none';
+
         buildPlacementBar();
         updateGameUI();
-        
-        if(loopId) cancelAnimationFrame(loopId);
-        if(spawnInterval) clearInterval(spawnInterval);
+
+        if (loopId) cancelAnimationFrame(loopId);
+        if (spawnInterval) clearInterval(spawnInterval);
+
         gameLoop();
     };
 
     function buildPlacementBar() {
-        const bar = document.getElementById('placement-bar'); bar.innerHTML = '';
+        const bar = document.getElementById('placement-bar');
+        bar.innerHTML = '';
+
         player.equipped.forEach(id => {
-            const h = HERO_DB[id];
+            const hero = HERO_DB[id];
             const slot = document.createElement('div');
-            slot.className = `roster-slot rarity-${h.rarity}`;
-            slot.innerHTML = `<svg width="40" height="40" viewBox="0 0 100 100">${h.svg}</svg><span class="roster-cost">${h.cost}g</span>`;
+
+            slot.className = `roster-slot rarity-${hero.rarity}`;
+
+            slot.innerHTML = `
+                <svg width="40" height="40" viewBox="0 0 100 100">${hero.svg}</svg>
+                <span class="roster-cost">${hero.cost}g</span>
+            `;
+
             slot.onclick = () => {
                 window.closeUpgradeMenu();
-                if(selectedHeroToPlace === h) { 
+
+                if (selectedHeroToPlace === hero) {
                     selectedHeroToPlace = null;
                     slot.classList.remove('active');
                 } else {
-                    document.querySelectorAll('.roster-slot').forEach(el => el.classList.remove('active'));
+                    document.querySelectorAll('.roster-slot').forEach(element => {
+                        element.classList.remove('active');
+                    });
+
                     slot.classList.add('active');
-                    selectedHeroToPlace = h;
+                    selectedHeroToPlace = hero;
                 }
             };
+
             bar.appendChild(slot);
         });
     }
@@ -534,45 +815,89 @@
         document.getElementById('game-wave').innerText = gameEnv.wave;
     }
 
+    // ==========================================
+    // MERGE TUTORIAL
+    // ==========================================
+
     function checkMergeTutorial() {
         if (player.hasSeenMergeTutorial) return;
-        let counts = {};
-        deployedHeroes.forEach(dh => {
-            if(!dh.node.occupied.isMerged) counts[dh.node.occupied.data.id] = (counts[dh.node.occupied.data.id] || 0) + 1;
+
+        const counts = {};
+
+        deployedHeroes.forEach(deployed => {
+            const hero = deployed.node.occupied;
+
+            if (hero && !hero.isMerged) {
+                counts[hero.data.id] = (counts[hero.data.id] || 0) + 1;
+            }
         });
-        
-        for(let id in counts) {
-            if(counts[id] >= 3) {
+
+        for (const id in counts) {
+            if (counts[id] >= 3) {
                 player.hasSeenMergeTutorial = true;
                 saveGame();
+
                 const box = document.getElementById('tutorial-box');
                 box.style.display = 'block';
                 box.style.borderColor = '#9b59b6';
-                box.innerHTML = "<h3 style='color:#9b59b6; margin:0 0 10px 0;'>MERGE UNLOCKED!</h3>You have 3 of the same Hero!<br>Click one of them and press <b>MERGE</b> to combine them into an APEX hero with insane stats!";
-                setTimeout(() => { box.style.display = 'none'; box.style.borderColor = '#66fcf1'; }, 8000);
+
+                box.innerHTML =
+                    "<h3 style='color:#9b59b6;margin:0 0 10px 0;'>MERGE UNLOCKED!</h3>" +
+                    "You have 3 of the same Hero!<br>" +
+                    "Click one of them and press <b>MERGE</b> to combine them into an APEX hero with insane stats!";
+
+                setTimeout(() => {
+                    box.style.display = 'none';
+                    box.style.borderColor = '#66fcf1';
+                }, 8000);
+
                 break;
             }
         }
     }
 
-    canvas.addEventListener('mousedown', (e) => {
+    // ==========================================
+    // TOWER PLACEMENT
+    // ==========================================
+
+    canvas.addEventListener('mousedown', event => {
         if (!gameEnv.active || gameEnv.isPaused) return;
-        const mx = e.clientX; const my = e.clientY;
+
+        const mx = event.clientX;
+        const my = event.clientY;
 
         let clickedNode = null;
-        nodes.forEach(n => { if (Math.hypot(mx - n.x, my - n.y) < n.radius) clickedNode = n; });
+
+        nodes.forEach(node => {
+            if (Math.hypot(mx - node.x, my - node.y) < node.radius) {
+                clickedNode = node;
+            }
+        });
 
         if (clickedNode) {
             if (selectedHeroToPlace && !clickedNode.occupied) {
                 if (gameEnv.gold >= selectedHeroToPlace.cost) {
                     gameEnv.gold -= selectedHeroToPlace.cost;
-                    clickedNode.occupied = { 
-                        data: selectedHeroToPlace, level: 1, invested: selectedHeroToPlace.cost, 
-                        cd: 0, maxCd: selectedHeroToPlace.cd, currentDmg: selectedHeroToPlace.dmg, currentRange: selectedHeroToPlace.range, isMerged: false
+
+                    clickedNode.occupied = {
+                        data: selectedHeroToPlace,
+                        level: 1,
+                        invested: selectedHeroToPlace.cost,
+                        cd: 0,
+                        maxCd: selectedHeroToPlace.cd,
+                        currentDmg: selectedHeroToPlace.dmg,
+                        currentRange: selectedHeroToPlace.range,
+                        isMerged: false
                     };
+
                     deployedHeroes.push({ node: clickedNode });
+
                     selectedHeroToPlace = null;
-                    document.querySelectorAll('.roster-slot').forEach(el => el.classList.remove('active'));
+
+                    document.querySelectorAll('.roster-slot').forEach(element => {
+                        element.classList.remove('active');
+                    });
+
                     updateGameUI();
                     checkMergeTutorial();
                 }
@@ -585,74 +910,123 @@
         }
     });
 
-    function calcUpgradeCost(hero) { return Math.floor(hero.data.cost * Math.pow(1.8, hero.level)); }
+    // ==========================================
+    // UPGRADES AND MERGING
+    // ==========================================
+
+    function calcUpgradeCost(hero) {
+        return Math.floor(hero.data.cost * Math.pow(1.8, hero.level));
+    }
 
     function openUpgradeMenu() {
-        const menu = document.getElementById('upgrade-menu');
-        menu.classList.add('open');
+        document.getElementById('upgrade-menu').classList.add('open');
         refreshUpgradeUI();
     }
 
     function refreshUpgradeUI() {
-        if(!selectedNodeForUpg) return;
+        if (!selectedNodeForUpg || !selectedNodeForUpg.occupied) return;
+
         const hero = selectedNodeForUpg.occupied;
-        
-        document.getElementById('upg-title').innerText = hero.data.name + (hero.isMerged ? " (APEX)" : "");
-        document.getElementById('upg-title').style.color = hero.isMerged ? "#9b59b6" : "#66fcf1";
+
+        document.getElementById('upg-title').innerText =
+            hero.data.name + (hero.isMerged ? ' (APEX)' : '');
+
+        document.getElementById('upg-title').style.color =
+            hero.isMerged ? '#9b59b6' : '#66fcf1';
+
         document.getElementById('upg-lvl').innerText = hero.level;
         document.getElementById('upg-dmg').innerText = hero.currentDmg;
         document.getElementById('upg-rng').innerText = hero.currentRange;
-        
-        let upgCost = calcUpgradeCost(hero);
-        let sellVal = Math.floor(hero.invested * 0.6); 
-        document.getElementById('sell-val').innerText = sellVal;
-        
-        const btnUpg = document.getElementById('btn-upgrade');
-        if(hero.level >= 5) {
-            btnUpg.innerText = "MAX LEVEL"; btnUpg.disabled = true;
+
+        const upgradeCost = calcUpgradeCost(hero);
+        const sellValue = Math.floor(hero.invested * 0.6);
+
+        document.getElementById('sell-val').innerText = sellValue;
+
+        const upgradeButton = document.getElementById('btn-upgrade');
+
+        if (hero.level >= 5) {
+            upgradeButton.innerText = 'MAX LEVEL';
+            upgradeButton.disabled = true;
         } else {
-            btnUpg.innerText = `Upgrade (${upgCost}g)`; btnUpg.disabled = gameEnv.gold < upgCost;
+            upgradeButton.innerText = `Upgrade (${upgradeCost}g)`;
+            upgradeButton.disabled = gameEnv.gold < upgradeCost;
         }
-        
-        const btnMerge = document.getElementById('btn-merge');
+
+        const mergeButton = document.getElementById('btn-merge');
+
         if (hero.isMerged) {
-            btnMerge.style.display = 'block';
-            btnMerge.innerText = "⭐ APEX MERGED ⭐"; btnMerge.disabled = true;
-            btnMerge.style.borderColor = "#9b59b6"; btnMerge.style.color = "#9b59b6";
+            mergeButton.style.display = 'block';
+            mergeButton.innerText = '⭐ APEX MERGED ⭐';
+            mergeButton.disabled = true;
+            mergeButton.style.borderColor = '#9b59b6';
+            mergeButton.style.color = '#9b59b6';
         } else {
-            let count = deployedHeroes.filter(dh => dh.node.occupied && !dh.node.occupied.isMerged && dh.node.occupied.data.id === hero.data.id).length;
-            btnMerge.style.display = 'block';
+            const count = deployedHeroes.filter(deployed =>
+                deployed.node.occupied &&
+                !deployed.node.occupied.isMerged &&
+                deployed.node.occupied.data.id === hero.data.id
+            ).length;
+
+            mergeButton.style.display = 'block';
+
             if (count >= 3) {
-                btnMerge.innerText = "MERGE (Consume 2)"; btnMerge.disabled = false;
-                btnMerge.style.borderColor = "#f1c40f"; btnMerge.style.color = "#f1c40f";
+                mergeButton.innerText = 'MERGE (Consume 2)';
+                mergeButton.disabled = false;
+                mergeButton.style.borderColor = '#f1c40f';
+                mergeButton.style.color = '#f1c40f';
             } else {
-                btnMerge.innerText = `Merge (${count}/3)`; btnMerge.disabled = true;
-                btnMerge.style.borderColor = "#555"; btnMerge.style.color = "#555";
+                mergeButton.innerText = `Merge (${count}/3)`;
+                mergeButton.disabled = true;
+                mergeButton.style.borderColor = '#555';
+                mergeButton.style.color = '#555';
             }
         }
     }
 
     window.mergeTower = function() {
-        if(!selectedNodeForUpg) return;
+        if (!selectedNodeForUpg || !selectedNodeForUpg.occupied) return;
+
         const hero = selectedNodeForUpg.occupied;
-        if(hero.isMerged) return;
-        
-        let others = deployedHeroes.filter(dh => dh.node !== selectedNodeForUpg && dh.node.occupied && !dh.node.occupied.isMerged && dh.node.occupied.data.id === hero.data.id);
-        
+        if (hero.isMerged) return;
+
+        const others = deployedHeroes.filter(deployed =>
+            deployed.node !== selectedNodeForUpg &&
+            deployed.node.occupied &&
+            !deployed.node.occupied.isMerged &&
+            deployed.node.occupied.data.id === hero.data.id
+        );
+
         if (others.length >= 2) {
-            let consumed1 = others[0]; let consumed2 = others[1];
-            hero.invested += consumed1.node.occupied.invested + consumed2.node.occupied.invested;
-            
-            consumed1.node.occupied = null; consumed2.node.occupied = null;
-            deployedHeroes = deployedHeroes.filter(dh => dh.node !== consumed1.node && dh.node !== consumed2.node);
-            
+            const consumed1 = others[0];
+            const consumed2 = others[1];
+
+            hero.invested +=
+                consumed1.node.occupied.invested +
+                consumed2.node.occupied.invested;
+
+            consumed1.node.occupied = null;
+            consumed2.node.occupied = null;
+
+            deployedHeroes = deployedHeroes.filter(deployed =>
+                deployed.node !== consumed1.node &&
+                deployed.node !== consumed2.node
+            );
+
             hero.isMerged = true;
             hero.currentDmg *= 3;
             hero.currentRange = Math.floor(hero.currentRange * 1.3);
-            hero.maxCd = Math.max(2, Math.floor(hero.maxCd / 2)); 
-            
-            spawnParticles(selectedNodeForUpg.x, selectedNodeForUpg.y, '#9b59b6', 50);
-            updateGameUI(); refreshUpgradeUI(); 
+            hero.maxCd = Math.max(2, Math.floor(hero.maxCd / 2));
+
+            spawnParticles(
+                selectedNodeForUpg.x,
+                selectedNodeForUpg.y,
+                '#9b59b6',
+                50
+            );
+
+            updateGameUI();
+            refreshUpgradeUI();
         }
     };
 
@@ -662,289 +1036,689 @@
     };
 
     window.buyUpgrade = function() {
-        if(!selectedNodeForUpg) return;
+        if (!selectedNodeForUpg || !selectedNodeForUpg.occupied) return;
+
         const hero = selectedNodeForUpg.occupied;
-        let upgCost = calcUpgradeCost(hero);
-        
-        if (gameEnv.gold >= upgCost && hero.level < 5) {
-            gameEnv.gold -= upgCost; hero.invested += upgCost; hero.level++;
+        const upgradeCost = calcUpgradeCost(hero);
+
+        if (gameEnv.gold >= upgradeCost && hero.level < 5) {
+            gameEnv.gold -= upgradeCost;
+            hero.invested += upgradeCost;
+            hero.level++;
+
             hero.currentDmg = Math.floor(hero.currentDmg * 1.5);
             hero.currentRange = Math.floor(hero.currentRange * 1.15);
-            updateGameUI(); refreshUpgradeUI(); 
+
+            updateGameUI();
+            refreshUpgradeUI();
         }
     };
 
     window.sellTower = function() {
-        if(!selectedNodeForUpg) return;
+        if (!selectedNodeForUpg || !selectedNodeForUpg.occupied) return;
+
         const hero = selectedNodeForUpg.occupied;
+
         gameEnv.gold += Math.floor(hero.invested * 0.6);
-        deployedHeroes = deployedHeroes.filter(dh => dh.node !== selectedNodeForUpg);
+
+        deployedHeroes = deployedHeroes.filter(deployed =>
+            deployed.node !== selectedNodeForUpg
+        );
+
         selectedNodeForUpg.occupied = null;
-        updateGameUI(); window.closeUpgradeMenu();
+
+        updateGameUI();
+        window.closeUpgradeMenu();
     };
+
+    // ==========================================
+    // WAVES AND ENEMIES
+    // ==========================================
 
     window.startWave = function() {
-        if (!waveSpawnsCompleted || enemies.length > 0) return; 
+        if (!waveSpawnsCompleted || enemies.length > 0) return;
 
-        gameEnv.wave++; updateGameUI();
-        waveSpawnsCompleted = false; waveSpawnsCount = 0;
-        
-        let baseCount = 10 + (gameEnv.wave * 5);
-        let diffMult = 1; let healthMult = 1; let speedMult = 1;
+        if (!gameEnv.isEndless && gameEnv.wave >= 20) return;
 
-        if (difficulty === 'hard') { diffMult = 2.5; healthMult = 1.5; }
-        if (difficulty === 'extreme') { diffMult = 5; healthMult = 2.5; speedMult = 1.2; }
-        if (difficulty === 'impossible') { diffMult = 10; healthMult = 4; speedMult = 1.5; }
-        
+        gameEnv.wave++;
+        updateGameUI();
+
+        waveSpawnsCompleted = false;
+        waveSpawnsCount = 0;
+
+        const baseCount = 10 + gameEnv.wave * 5;
+
+        let diffMult = 1;
+        let healthMult = 1;
+        let speedMult = 1;
+
+        if (difficulty === 'hard') {
+            diffMult = 2.5;
+            healthMult = 1.5;
+        }
+
+        if (difficulty === 'extreme') {
+            diffMult = 5;
+            healthMult = 2.5;
+            speedMult = 1.2;
+        }
+
+        if (difficulty === 'impossible') {
+            diffMult = 10;
+            healthMult = 4;
+            speedMult = 1.5;
+        }
+
         waveSpawnsTotal = Math.floor(baseCount * diffMult);
-        let sTime = Math.max(30, 800 - (gameEnv.wave*20) - (diffMult * 60)); 
-        
+
+        const spawnTime = Math.max(
+            30,
+            800 - gameEnv.wave * 20 - diffMult * 60
+        );
+
+        if (spawnInterval) clearInterval(spawnInterval);
+
         spawnInterval = setInterval(() => {
-            if (waveSpawnsCount >= waveSpawnsTotal || !gameEnv.active || gameEnv.isPaused) {
-                if(waveSpawnsCount >= waveSpawnsTotal) {
-                    clearInterval(spawnInterval); waveSpawnsCompleted = true; 
-                }
-                return; 
+            if (!gameEnv.active) {
+                clearInterval(spawnInterval);
+                return;
             }
 
-            let rand = Math.random();
-            let eType = "Normal"; let color = "#e74c3c"; let sz = 14;
-            let spd = (1.5 + (gameEnv.wave*0.1)) * speedMult;
+            if (gameEnv.isPaused) return;
+
+            if (waveSpawnsCount >= waveSpawnsTotal) {
+                clearInterval(spawnInterval);
+                waveSpawnsCompleted = true;
+                return;
+            }
+
+            const rand = Math.random();
+
+            let eType = 'Normal';
+            let color = '#e74c3c';
+            let size = 14;
+
+            let speed = (1.5 + gameEnv.wave * 0.1) * speedMult;
             let hp = (30 + gameEnv.wave * 35) * healthMult;
 
-            if (gameEnv.wave >= 20 && waveSpawnsCount % 25 === 0) { eType = "Titan"; color = "#000"; spd *= 0.2; hp *= 50; sz = 55; }
-            else if (gameEnv.wave >= 18 && rand > 0.9) { eType = "Colossus"; color = "#34495e"; spd *= 0.4; hp *= 15; sz = 30; }
-            else if (gameEnv.wave >= 15 && waveSpawnsCount % 20 === 0) { eType = "Boss"; color = "#8e44ad"; spd *= 0.5; hp *= 10; sz = 35; }
-            else if (gameEnv.wave >= 20 && rand > 0.95) { eType = "Juggernaut"; color = "#2c3e50"; spd *= 0.3; hp *= 25; sz = 45; }
-            else if (gameEnv.wave >= 16 && rand > 0.85) { eType = "Assassin"; color = "#8e44ad"; spd *= 2.5; hp *= 0.6; sz = 12; }
-            else if (gameEnv.wave >= 14 && rand > 0.8) { eType = "Wraith"; color = "rgba(189, 195, 199, 0.5)"; spd *= 1.6; hp *= 0.7; sz = 15; }
-            else if (gameEnv.wave >= 12 && rand > 0.75) { eType = "Ghost"; color = "rgba(236, 240, 241, 0.6)"; spd *= 1.4; hp *= 0.8; sz = 16; }
-            else if (gameEnv.wave >= 8 && rand > 0.6) { eType = "Tank"; color = "#7f8c8d"; spd *= 0.6; hp *= 3.5; sz = 22; }
-            else if (gameEnv.wave >= 4 && rand > 0.4) { eType = "Swarmer"; color = "#e67e22"; spd *= 2.2; hp *= 0.2; sz = 8; }
-            else if (rand > 0.2) { eType = "Sprinter"; color = "#f1c40f"; spd *= 1.8; hp *= 0.5; sz = 11; }
+            if (gameEnv.wave >= 20 && waveSpawnsCount % 25 === 0) {
+                eType = 'Titan';
+                color = '#000';
+                speed *= 0.2;
+                hp *= 50;
+                size = 55;
+            } else if (gameEnv.wave >= 18 && rand > 0.9) {
+                eType = 'Colossus';
+                color = '#34495e';
+                speed *= 0.4;
+                hp *= 15;
+                size = 30;
+            } else if (gameEnv.wave >= 15 && waveSpawnsCount % 20 === 0) {
+                eType = 'Boss';
+                color = '#8e44ad';
+                speed *= 0.5;
+                hp *= 10;
+                size = 35;
+            } else if (gameEnv.wave >= 20 && rand > 0.95) {
+                eType = 'Juggernaut';
+                color = '#2c3e50';
+                speed *= 0.3;
+                hp *= 25;
+                size = 45;
+            } else if (gameEnv.wave >= 16 && rand > 0.85) {
+                eType = 'Assassin';
+                color = '#8e44ad';
+                speed *= 2.5;
+                hp *= 0.6;
+                size = 12;
+            } else if (gameEnv.wave >= 14 && rand > 0.8) {
+                eType = 'Wraith';
+                color = 'rgba(189,195,199,0.5)';
+                speed *= 1.6;
+                hp *= 0.7;
+                size = 15;
+            } else if (gameEnv.wave >= 12 && rand > 0.75) {
+                eType = 'Ghost';
+                color = 'rgba(236,240,241,0.6)';
+                speed *= 1.4;
+                hp *= 0.8;
+                size = 16;
+            } else if (gameEnv.wave >= 8 && rand > 0.6) {
+                eType = 'Tank';
+                color = '#7f8c8d';
+                speed *= 0.6;
+                hp *= 3.5;
+                size = 22;
+            } else if (gameEnv.wave >= 4 && rand > 0.4) {
+                eType = 'Swarmer';
+                color = '#e67e22';
+                speed *= 2.2;
+                hp *= 0.2;
+                size = 8;
+            } else if (rand > 0.2) {
+                eType = 'Sprinter';
+                color = '#f1c40f';
+                speed *= 1.8;
+                hp *= 0.5;
+                size = 11;
+            }
 
-            enemies.push({ 
-                x: path[0].x + (Math.random()*10 - 5), y: path[0].y + (Math.random()*10 - 5), 
-                targetIdx: 1, type: eType, speed: spd, hp: hp, maxHp: hp, size: sz, color: color, isDead: false
+            enemies.push({
+                x: path[0].x + (Math.random() * 10 - 5),
+                y: path[0].y + (Math.random() * 10 - 5),
+                targetIdx: 1,
+                type: eType,
+                speed,
+                hp,
+                maxHp: hp,
+                size,
+                color,
+                isDead: false
             });
+
             waveSpawnsCount++;
-        }, sTime); 
+        }, spawnTime);
     };
 
+    // ==========================================
+    // PAUSE, VICTORY, AND EXIT
+    // ==========================================
+
     window.togglePause = function() {
+        if (!gameEnv.active) return;
+
         gameEnv.isPaused = !gameEnv.isPaused;
-        document.getElementById('pause-overlay').style.display = gameEnv.isPaused ? 'flex' : 'none';
+
+        document.getElementById('pause-overlay').style.display =
+            gameEnv.isPaused ? 'flex' : 'none';
     };
 
     window.exitToMenu = function() {
         gameEnv.active = false;
+
         document.getElementById('pause-overlay').style.display = 'none';
         document.getElementById('endless-overlay').style.display = 'none';
-        if(spawnInterval) clearInterval(spawnInterval);
-        if(loopId) cancelAnimationFrame(loopId);
+
+        if (spawnInterval) {
+            clearInterval(spawnInterval);
+            spawnInterval = null;
+        }
+
+        if (loopId) {
+            cancelAnimationFrame(loopId);
+            loopId = null;
+        }
+
         showScreen('screen-menu');
         saveGame();
     };
 
     function triggerVictory() {
+        if (gameEnv.isEndless) return;
+
         gameEnv.isPaused = true;
+
         let reward = 50;
-        if(difficulty === 'hard') reward = 75;
-        if(difficulty === 'extreme') reward = 100;
-        if(difficulty === 'impossible') reward = 150;
-        player.shards += reward; saveGame();
+
+        if (difficulty === 'hard') reward = 75;
+        if (difficulty === 'extreme') reward = 100;
+        if (difficulty === 'impossible') reward = 150;
+
+        player.shards += reward;
+        saveGame();
+
         document.getElementById('endless-overlay').style.display = 'flex';
     }
 
     window.continueEndless = function() {
         gameEnv.isEndless = true;
         gameEnv.isPaused = false;
+
         document.getElementById('endless-overlay').style.display = 'none';
     };
 
+    // ==========================================
+    // MAIN GAME LOOP
+    // ==========================================
+
     function gameLoop() {
         if (!gameEnv.active) return;
-        if (!gameEnv.isPaused) updateEngine();
+
+        if (!gameEnv.isPaused) {
+            updateEngine();
+        }
+
         drawEngine();
+
         loopId = requestAnimationFrame(gameLoop);
     }
 
     function updateEngine() {
-        if(selectedNodeForUpg) refreshUpgradeUI();
+        if (selectedNodeForUpg) {
+            refreshUpgradeUI();
+        }
 
+        // Move enemies along the path.
         for (let i = enemies.length - 1; i >= 0; i--) {
-            let e = enemies[i];
-            if(e.isDead) continue;
-            let t = path[e.targetIdx];
-            let dist = Math.hypot(t.x - e.x, t.y - e.y);
-            if (dist < e.speed) {
-                e.x = t.x; e.y = t.y;
-                e.targetIdx++;
-                if (e.targetIdx >= path.length) {
-                    gameEnv.lives--; updateGameUI();
-                    e.isDead = true;
-                    if (gameEnv.lives <= 0) { alert("Base Destroyed!"); window.exitToMenu(); return; }
+            const enemy = enemies[i];
+
+            if (enemy.isDead) continue;
+
+            const target = path[enemy.targetIdx];
+
+            if (!target) {
+                enemy.isDead = true;
+                continue;
+            }
+
+            const distance = Math.hypot(
+                target.x - enemy.x,
+                target.y - enemy.y
+            );
+
+            if (distance < enemy.speed) {
+                enemy.x = target.x;
+                enemy.y = target.y;
+                enemy.targetIdx++;
+
+                if (enemy.targetIdx >= path.length) {
+                    gameEnv.lives--;
+                    updateGameUI();
+
+                    enemy.isDead = true;
+
+                    if (gameEnv.lives <= 0) {
+                        alert('Base Destroyed!');
+                        window.exitToMenu();
+                        return;
+                    }
                 }
             } else {
-                e.x += (t.x - e.x) / dist * e.speed; e.y += (t.y - e.y) / dist * e.speed;
+                enemy.x += (target.x - enemy.x) / distance * enemy.speed;
+                enemy.y += (target.y - enemy.y) / distance * enemy.speed;
             }
         }
 
-        deployedHeroes.forEach(dh => {
-            let hero = dh.node.occupied;
-            if (hero.cd > 0) hero.cd--;
-            else {
-                let target = null; let maxProgress = -1; 
-                enemies.forEach(e => {
-                    let d = Math.hypot(e.x - dh.node.x, e.y - dh.node.y);
-                    let effectiveRange = (e.type === 'Ghost' || e.type === 'Wraith') ? hero.currentRange * 0.5 : hero.currentRange;
+        // Heroes target enemies.
+        deployedHeroes.forEach(deployed => {
+            const hero = deployed.node.occupied;
+            if (!hero) return;
 
-                    if (d <= effectiveRange && !e.isDead) { 
-                        let distToNode = Math.hypot(path[e.targetIdx].x - e.x, path[e.targetIdx].y - e.y);
-                        let progress = e.targetIdx - (distToNode / 10000); 
-                        if (progress > maxProgress) { maxProgress = progress; target = e; }
+            if (hero.cd > 0) {
+                hero.cd--;
+            } else {
+                let target = null;
+                let maxProgress = -1;
+
+                enemies.forEach(enemy => {
+                    const distance = Math.hypot(
+                        enemy.x - deployed.node.x,
+                        enemy.y - deployed.node.y
+                    );
+
+                    const effectiveRange =
+                        enemy.type === 'Ghost' || enemy.type === 'Wraith'
+                            ? hero.currentRange * 0.5
+                            : hero.currentRange;
+
+                    if (distance <= effectiveRange && !enemy.isDead) {
+                        const pathTarget = path[enemy.targetIdx];
+                        if (!pathTarget) return;
+
+                        const distanceToNext = Math.hypot(
+                            pathTarget.x - enemy.x,
+                            pathTarget.y - enemy.y
+                        );
+
+                        const progress = enemy.targetIdx - distanceToNext / 10000;
+
+                        if (progress > maxProgress) {
+                            maxProgress = progress;
+                            target = enemy;
+                        }
                     }
                 });
-                
+
                 if (target) {
                     hero.cd = hero.maxCd;
-                    spawnParticles(dh.node.x, dh.node.y, hero.isMerged ? '#9b59b6' : '#f1c40f', 3);
-                    projectiles.push({ x: dh.node.x, y: dh.node.y, target: target, dmg: hero.currentDmg, speed: hero.data.projSpeed, color: hero.isMerged ? '#9b59b6' : hero.data.color, lastX: target.x, lastY: target.y });
+
+                    spawnParticles(
+                        deployed.node.x,
+                        deployed.node.y,
+                        hero.isMerged ? '#9b59b6' : '#f1c40f',
+                        3
+                    );
+
+                    projectiles.push({
+                        x: deployed.node.x,
+                        y: deployed.node.y,
+                        target,
+                        dmg: hero.currentDmg,
+                        speed: hero.data.projSpeed,
+                        color: hero.isMerged ? '#9b59b6' : hero.data.color,
+                        lastX: target.x,
+                        lastY: target.y
+                    });
                 }
             }
         });
 
+        // Move projectiles and apply damage.
         for (let i = projectiles.length - 1; i >= 0; i--) {
-            let p = projectiles[i];
-            let targetX = p.target.isDead ? p.lastX : p.target.x;
-            let targetY = p.target.isDead ? p.lastY : p.target.y;
+            const projectile = projectiles[i];
 
-            if (!p.target.isDead) { p.lastX = p.target.x; p.lastY = p.target.y; }
-            
-            let dist = Math.hypot(targetX - p.x, targetY - p.y);
-            if (dist < p.speed) {
-                if (!p.target.isDead) {
-                    p.target.hp -= p.dmg;
-                    if (p.target.hp <= 0 && !p.target.isDead) {
-                        p.target.isDead = true; 
-                        
-                        let goldReward = p.target.type === 'Titan' ? 250 : (p.target.type === 'Boss' ? 100 : (p.target.type === 'Juggernaut' ? 150 : (p.target.type === 'Tank' ? 25 : 15)));
-                        gameEnv.gold += goldReward + Math.floor(gameEnv.wave*3); 
-                        
+            const targetX = projectile.target.isDead
+                ? projectile.lastX
+                : projectile.target.x;
+
+            const targetY = projectile.target.isDead
+                ? projectile.lastY
+                : projectile.target.y;
+
+            if (!projectile.target.isDead) {
+                projectile.lastX = projectile.target.x;
+                projectile.lastY = projectile.target.y;
+            }
+
+            const distance = Math.hypot(
+                targetX - projectile.x,
+                targetY - projectile.y
+            );
+
+            if (distance < projectile.speed) {
+                if (!projectile.target.isDead) {
+                    projectile.target.hp -= projectile.dmg;
+
+                    if (
+                        projectile.target.hp <= 0 &&
+                        !projectile.target.isDead
+                    ) {
+                        const target = projectile.target;
+                        target.isDead = true;
+
+                        let goldReward =
+                            target.type === 'Titan' ? 250 :
+                            target.type === 'Boss' ? 100 :
+                            target.type === 'Juggernaut' ? 150 :
+                            target.type === 'Tank' ? 25 : 15;
+
+                        gameEnv.gold += goldReward + Math.floor(gameEnv.wave * 3);
+
                         let shardDrop = 0;
-                        if (p.target.type === 'Titan') shardDrop = 5;
-                        else if (p.target.type === 'Boss') shardDrop = 3;
-                        else if (p.target.type === 'Juggernaut') shardDrop = 2;
-                        else if (Math.random() < 0.20) shardDrop = 1; 
 
-                        if(difficulty === 'hard') shardDrop = Math.ceil(shardDrop * 1.5); 
-                        if(difficulty === 'extreme') shardDrop *= 2; 
-                        if(difficulty === 'impossible') shardDrop *= 3; 
-                        
+                        if (target.type === 'Titan') {
+                            shardDrop = 5;
+                        } else if (target.type === 'Boss') {
+                            shardDrop = 3;
+                        } else if (target.type === 'Juggernaut') {
+                            shardDrop = 2;
+                        } else if (Math.random() < 0.2) {
+                            shardDrop = 1;
+                        }
+
+                        if (difficulty === 'hard') {
+                            shardDrop = Math.ceil(shardDrop * 1.5);
+                        }
+
+                        if (difficulty === 'extreme') {
+                            shardDrop *= 2;
+                        }
+
+                        if (difficulty === 'impossible') {
+                            shardDrop *= 3;
+                        }
+
                         player.shards += shardDrop;
-                        
-                        spawnParticles(p.target.x, p.target.y, p.target.color, p.target.type === 'Boss' ? 30 : 10);
+
+                        spawnParticles(
+                            target.x,
+                            target.y,
+                            target.color,
+                            target.type === 'Boss' ? 30 : 10
+                        );
+
                         updateGameUI();
+                        updateShardsUI();
                     }
                 }
-                projectiles.splice(i, 1); 
+
+                projectiles.splice(i, 1);
             } else {
-                p.x += (targetX - p.x) / dist * p.speed; p.y += (targetY - p.y) / dist * p.speed;
+                projectile.x +=
+                    (targetX - projectile.x) / distance * projectile.speed;
+
+                projectile.y +=
+                    (targetY - projectile.y) / distance * projectile.speed;
             }
         }
 
-        enemies = enemies.filter(e => !e.isDead);
+        enemies = enemies.filter(enemy => !enemy.isDead);
 
-        if (!gameEnv.isEndless && gameEnv.wave >= 20 && enemies.length === 0 && waveSpawnsCompleted) triggerVictory();
+        // Victory after wave 20.
+        if (
+            !gameEnv.isEndless &&
+            gameEnv.wave >= 20 &&
+            enemies.length === 0 &&
+            waveSpawnsCompleted
+        ) {
+            triggerVictory();
+        }
 
-        for(let i = particles.length - 1; i >= 0; i--) {
-            let p = particles[i];
-            p.x += p.vx; p.y += p.vy;
-            p.life -= 0.05;
-            if(p.life <= 0) particles.splice(i, 1);
+        // Update particle effects.
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const particle = particles[i];
+
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+            particle.life -= 0.05;
+
+            if (particle.life <= 0) {
+                particles.splice(i, 1);
+            }
         }
     }
 
+    // ==========================================
+    // DRAW GAME
+    // ==========================================
+
     function drawEngine() {
-        ctx.fillStyle = difficulty === 'impossible' ? '#1a0a0a' : '#1e2d24'; 
+        ctx.fillStyle = difficulty === 'impossible' ? '#1a0a0a' : '#1e2d24';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.fillStyle = "rgba(255,255,255,0.05)";
-        for(let x=0; x<canvas.width; x+=50) {
-            for(let y=0; y<canvas.height; y+=50) { ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI*2); ctx.fill(); }
+
+        // Background dots.
+        ctx.fillStyle = 'rgba(255,255,255,0.05)';
+
+        for (let x = 0; x < canvas.width; x += 50) {
+            for (let y = 0; y < canvas.height; y += 50) {
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
 
-        ctx.strokeStyle = difficulty === 'impossible' ? "#3a1d1d" : "#5a4d41"; 
-        ctx.lineWidth = 55; ctx.lineJoin = "round"; ctx.lineCap = "round";
-        ctx.beginPath(); ctx.moveTo(path[0].x, path[0].y);
-        for(let i=1; i<path.length; i++) ctx.lineTo(path[i].x, path[i].y);
+        // Enemy path.
+        ctx.strokeStyle = difficulty === 'impossible' ? '#3a1d1d' : '#5a4d41';
+        ctx.lineWidth = 55;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+
+        ctx.beginPath();
+        ctx.moveTo(path[0].x, path[0].y);
+
+        for (let i = 1; i < path.length; i++) {
+            ctx.lineTo(path[i].x, path[i].y);
+        }
+
         ctx.stroke();
 
-        const base = path[path.length-1];
-        ctx.fillStyle = '#3498db'; ctx.beginPath(); ctx.arc(base.x, base.y, 45, 0, Math.PI*2); ctx.fill();
+        // Base.
+        const base = path[path.length - 1];
 
-        nodes.forEach(n => {
-            ctx.fillStyle = "rgba(0,0,0,0.5)";
-            ctx.beginPath(); ctx.arc(n.x, n.y, n.radius, 0, Math.PI*2); ctx.fill();
-            
-            if (!n.occupied && selectedHeroToPlace) {
+        ctx.fillStyle = '#3498db';
+        ctx.beginPath();
+        ctx.arc(base.x, base.y, 45, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Placement nodes and heroes.
+        nodes.forEach(node => {
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (!node.occupied && selectedHeroToPlace) {
                 ctx.lineWidth = 4;
-                ctx.strokeStyle = gameEnv.gold >= selectedHeroToPlace.cost ? "#2ecc71" : "#e74c3c";
+
+                ctx.strokeStyle =
+                    gameEnv.gold >= selectedHeroToPlace.cost
+                        ? '#2ecc71'
+                        : '#e74c3c';
+
                 ctx.stroke();
             }
 
-            if (n.occupied) {
-                drawHeroGraphic(n.occupied.data, n.x, n.y);
-                
-                if (n.occupied.isMerged) {
-                    ctx.strokeStyle = "#9b59b6"; ctx.lineWidth = 6;
-                    ctx.beginPath(); ctx.arc(n.x, n.y, 28, 0, Math.PI*2); ctx.stroke();
+            if (node.occupied) {
+                drawHeroGraphic(node.occupied.data, node.x, node.y);
+
+                if (node.occupied.isMerged) {
+                    ctx.strokeStyle = '#9b59b6';
+                    ctx.lineWidth = 6;
+
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, 28, 0, Math.PI * 2);
+                    ctx.stroke();
                 }
 
-                ctx.fillStyle = "#f1c40f";
-                for(let l=0; l<n.occupied.level; l++) { ctx.fillRect(n.x - 15 + (l*8), n.y + 25, 6, 6); }
+                // Level indicators.
+                ctx.fillStyle = '#f1c40f';
 
-                if (selectedNodeForUpg === n) {
-                    ctx.strokeStyle = "rgba(255, 255, 255, 0.25)"; ctx.lineWidth = 2;
-                    ctx.beginPath(); ctx.arc(n.x, n.y, n.occupied.currentRange, 0, Math.PI*2); ctx.stroke();
-                    ctx.strokeStyle = "#f1c40f"; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(n.x, n.y, n.radius+2, 0, Math.PI*2); ctx.stroke();
+                for (let level = 0; level < node.occupied.level; level++) {
+                    ctx.fillRect(
+                        node.x - 15 + level * 8,
+                        node.y + 25,
+                        6,
+                        6
+                    );
+                }
+
+                if (selectedNodeForUpg === node) {
+                    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+                    ctx.lineWidth = 2;
+
+                    ctx.beginPath();
+                    ctx.arc(
+                        node.x,
+                        node.y,
+                        node.occupied.currentRange,
+                        0,
+                        Math.PI * 2
+                    );
+                    ctx.stroke();
+
+                    ctx.strokeStyle = '#f1c40f';
+                    ctx.lineWidth = 4;
+
+                    ctx.beginPath();
+                    ctx.arc(
+                        node.x,
+                        node.y,
+                        node.radius + 2,
+                        0,
+                        Math.PI * 2
+                    );
+                    ctx.stroke();
                 }
             }
         });
 
-        enemies.forEach(e => {
-            ctx.fillStyle = e.color; ctx.beginPath(); ctx.arc(e.x, e.y, e.size, 0, Math.PI*2); ctx.fill();
-            
-            if (e.type !== 'Swarmer') {
-                ctx.fillStyle = "black"; ctx.fillRect(e.x - 15, e.y - e.size - 10, 30, 5);
-                ctx.fillStyle = "#2ecc71"; ctx.fillRect(e.x - 15, e.y - e.size - 10, 30 * (e.hp / e.maxHp), 5);
+        // Enemies and health bars.
+        enemies.forEach(enemy => {
+            ctx.fillStyle = enemy.color;
+            ctx.beginPath();
+            ctx.arc(enemy.x, enemy.y, enemy.size, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (enemy.type !== 'Swarmer') {
+                ctx.fillStyle = 'black';
+
+                ctx.fillRect(
+                    enemy.x - 15,
+                    enemy.y - enemy.size - 10,
+                    30,
+                    5
+                );
+
+                ctx.fillStyle = '#2ecc71';
+
+                ctx.fillRect(
+                    enemy.x - 15,
+                    enemy.y - enemy.size - 10,
+                    30 * Math.max(0, enemy.hp / enemy.maxHp),
+                    5
+                );
             }
         });
 
-        projectiles.forEach(p => {
-            ctx.fillStyle = p.color; ctx.shadowBlur = 15; ctx.shadowColor = p.color;
-            ctx.beginPath(); ctx.arc(p.x, p.y, 7, 0, Math.PI*2); ctx.fill();
+        // Projectiles.
+        projectiles.forEach(projectile => {
+            ctx.fillStyle = projectile.color;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = projectile.color;
+
+            ctx.beginPath();
+            ctx.arc(projectile.x, projectile.y, 7, 0, Math.PI * 2);
+            ctx.fill();
+
             ctx.shadowBlur = 0;
         });
 
-        particles.forEach(p => {
-            ctx.globalAlpha = Math.max(0, p.life);
-            ctx.fillStyle = p.color;
-            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
-            ctx.globalAlpha = 1.0;
+        // Particles.
+        particles.forEach(particle => {
+            ctx.globalAlpha = Math.max(0, particle.life);
+            ctx.fillStyle = particle.color;
+
+            ctx.beginPath();
+            ctx.arc(
+                particle.x,
+                particle.y,
+                particle.size,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+
+            ctx.globalAlpha = 1;
         });
     }
 
     function drawHeroGraphic(data, x, y) {
         ctx.fillStyle = data.color;
-        ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI*2); ctx.fill();
-        ctx.lineWidth = 4; ctx.strokeStyle = getRarityColor(data.rarity); ctx.stroke();
-        
-        ctx.fillStyle = "white"; ctx.font = "bold 14px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+
+        ctx.beginPath();
+        ctx.arc(x, y, 22, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = getRarityColor(data.rarity);
+        ctx.stroke();
+
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
         ctx.fillText(data.name.substring(0, 3).toUpperCase(), x, y);
     }
 
-})(); // End of Anti-Cheat Vault
+    // Initialize the shard display.
+    updateShardsUI();
+
+    // Set a default selected difficulty.
+    window.setDifficulty('easy');
+
+})(); // End of game
 </script>
 </body>
 </html>
+```
