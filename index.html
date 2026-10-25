@@ -1,7 +1,7 @@
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head></head><body>
+
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Defenders of the Realm: Ultimate Chaos</title>
@@ -45,6 +45,9 @@
         #in-game-ui { position: absolute; top: 20px; left: 20px; background: rgba(11,12,16,0.85); padding: 15px; border-radius: 10px; border: 2px solid #45a29e; z-index: 5; pointer-events: auto; }
         .stat { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
         #btn-pause { position: absolute; top: 20px; right: 20px; z-index: 5; background: #1f2833; border: 2px solid #c5c6c7; padding: 10px 20px; }
+        #speed-controls { position: absolute; top: 78px; right: 20px; z-index: 5; display: flex; gap: 6px; background: rgba(11,12,16,0.85); padding: 8px; border: 2px solid #45a29e; border-radius: 8px; }
+        .speed-btn { margin: 0; padding: 8px 11px; font-size: 14px; }
+        .speed-btn.active { background: linear-gradient(135deg, #f1c40f, #e67e22); border-color: #fff; color: #111; box-shadow: 0 0 12px rgba(241,196,15,.6); }
 
         #placement-bar { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(11,12,16,0.9); border: 2px solid #45a29e; border-radius: 12px; display: flex; padding: 10px; z-index: 5; gap: 15px; }
         .roster-slot { width: 70px; height: 70px; background: #1f2833; border: 2px solid #c5c6c7; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
@@ -88,11 +91,11 @@
             #upgrade-menu { width: 210px; padding: 12px; }
         }
     </style>
-</head>
-<body>
+
+
 
 <div id="game-container">
-    <div class="top-bar" id="ui-shards">💎 Shards: <span id="shard-count">0</span></div>
+    <div class="top-bar" id="ui-shards">💎 Shards: <span id="shard-count">100</span></div>
 
     <div id="screen-menu" class="screen active-screen">
         <h1>Defenders of the Realm</h1>
@@ -142,17 +145,17 @@
     <div id="screen-map" class="screen">
         <h2>Select Difficulty</h2>
         <div class="grid">
-            <button class="btn diff-btn" id="btn-easy" onclick="setDifficulty('easy')" style="border-color:#2ecc71;">Easy Mode</button>
-            <button class="btn diff-btn" id="btn-hard" onclick="setDifficulty('hard')" style="border-color:#f1c40f;">Hard Mode</button>
-            <button class="btn diff-btn" id="btn-extreme" onclick="setDifficulty('extreme')" style="border-color:#e67e22;">Extreme Mode</button>
-            <button class="btn diff-btn" id="btn-impossible" onclick="setDifficulty('impossible')" style="border-color:#e74c3c;background:#4a0000;">IMPOSSIBLE</button>
+            <button class="btn diff-btn" id="btn-easy" onclick="setDifficulty('easy')" style="border-color: rgb(46, 204, 113); box-shadow: rgb(46, 204, 113) 0px 0px 20px;">Easy Mode</button>
+            <button class="btn diff-btn" id="btn-hard" onclick="setDifficulty('hard')" style="border-color: rgb(241, 196, 15); box-shadow: none;">Hard Mode</button>
+            <button class="btn diff-btn" id="btn-extreme" onclick="setDifficulty('extreme')" style="border-color: rgb(230, 126, 34); box-shadow: none;">Extreme Mode</button>
+            <button class="btn diff-btn" id="btn-impossible" onclick="setDifficulty('impossible')" style="border-color: rgb(231, 76, 60); background: rgb(74, 0, 0); box-shadow: none;">IMPOSSIBLE</button>
         </div>
         <button class="btn" id="btn-start-game" onclick="startGame()" style="font-size:24px;padding:15px 40px;margin-top:30px;">Start Battle</button>
         <button class="btn" onclick="showScreen('screen-menu')" style="border-color:#555;">Back</button>
     </div>
 
     <div id="screen-game" class="screen" style="background:transparent;overflow:hidden;">
-        <canvas id="gameCanvas"></canvas>
+        <canvas id="gameCanvas" width="338" height="842"></canvas>
 
         <div id="in-game-ui">
             <div class="stat">Gold: <span id="game-gold" style="color:gold;">100</span></div>
@@ -162,6 +165,12 @@
         </div>
 
         <button class="btn" id="btn-pause" onclick="togglePause()">II Pause</button>
+        <div id="speed-controls" aria-label="Game speed">
+            <button class="btn speed-btn active" id="btn-speed-1" onclick="setGameSpeed(1)">1×</button>
+            <button class="btn speed-btn" id="btn-speed-2" onclick="setGameSpeed(2)">2×</button>
+            <button class="btn speed-btn" id="btn-speed-3" onclick="setGameSpeed(3)">3×</button>
+            <button class="btn speed-btn" id="btn-speed-4" onclick="setGameSpeed(4)">4×</button>
+        </div>
         <div id="placement-bar"></div>
 
         <div id="upgrade-menu">
@@ -442,6 +451,7 @@
     let path = [];
     let loopId = null;
     let spawnInterval = null;
+    let gameSpeed = 1;
     let selectedHeroToPlace = null;
     let selectedNodeForUpg = null;
 
@@ -666,6 +676,21 @@
         }
     });
 
+    // Select the simulation speed. The speed is reset when a new battle starts.
+    window.setGameSpeed = function(speed) {
+        const allowedSpeeds = [1, 2, 3, 4];
+        if (!allowedSpeeds.includes(speed)) return;
+        gameSpeed = speed;
+
+        allowedSpeeds.forEach(value => {
+            const button = document.getElementById(`btn-speed-${value}`);
+            if (button) {
+                button.classList.toggle('active', value === gameSpeed);
+                button.setAttribute('aria-pressed', value === gameSpeed ? 'true' : 'false');
+            }
+        });
+    };
+
     function recalculateMap() {
         const w = canvas.width;
         const h = canvas.height;
@@ -740,6 +765,8 @@
             startGold = 50;
             startLives = 1;
         }
+
+        window.setGameSpeed(1);
 
         gameEnv = {
             gold: startGold,
@@ -1113,7 +1140,7 @@
 
         const spawnTime = Math.max(
             30,
-            800 - gameEnv.wave * 20 - diffMult * 60
+            (800 - gameEnv.wave * 20 - diffMult * 60) / gameSpeed
         );
 
         if (spawnInterval) clearInterval(spawnInterval);
@@ -1285,7 +1312,10 @@
         if (!gameEnv.active) return;
 
         if (!gameEnv.isPaused) {
-            updateEngine();
+            // Run the simulation multiple times per rendered frame for faster gameplay.
+            for (let step = 0; step < gameSpeed; step++) {
+                updateEngine();
+            }
         }
 
         drawEngine();
@@ -1719,6 +1749,6 @@
 
 })(); // End of game
 </script>
-</body>
-</html>
-```
+
+
+```</body></html>
